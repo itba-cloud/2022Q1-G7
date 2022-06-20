@@ -9,7 +9,7 @@ resource "aws_api_gateway_rest_api" "this" {
 }
 
 module "courses" {
-  source = "../../modules/api_resource_4.0"
+  source = "../../modules/api_resource"
   providers = {
     aws = aws.aws
   }
@@ -19,19 +19,8 @@ module "courses" {
   methods   = local.apigateway.resources["courses"]
 }
 
-module "courses_by_id" {
-  source = "../../modules/api_resource_4.0"
-  providers = {
-    aws = aws.aws
-  }
-  api_id    = aws_api_gateway_rest_api.this.id
-  part      = "{courseId}"
-  parent_id = module.courses.id
-  methods   = local.apigateway.resources["courses_by_id"]
-}
-
 module "profiles" {
-  source = "../../modules/api_resource_4.0"
+  source = "../../modules/api_resource"
   providers = {
     aws = aws.aws
   }
@@ -42,7 +31,7 @@ module "profiles" {
 }
 
 module "threads" {
-  source = "../../modules/api_resource_4.0"
+  source = "../../modules/api_resource"
   providers = {
     aws = aws.aws
   }
@@ -52,30 +41,56 @@ module "threads" {
   methods   = local.apigateway.resources["threads"]
 }
 
+resource "aws_api_gateway_deployment" "this" {
+  provider = aws.aws
+  depends_on = [
+    module.courses,
+    module.profiles,
+    module.threads
+  ]
+  rest_api_id = aws_api_gateway_rest_api.this.id
 
-# resource "aws_api_gateway_deployment" "this" {
-#   provider = aws.aws
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.this.body,
+    ]))
+  }
 
-#   rest_api_id = aws_api_gateway_rest_api.this.id
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-#   triggers = {
-#     redeployment = sha1(jsonencode([
-#       # aws_api_gateway_rest_api.this.body,
-#       aws_api_gateway_resource.this.id,
-#       aws_api_gateway_method.this.id,
-#       aws_api_gateway_integration.this.id,
-#     ]))
-#   }
+resource "aws_api_gateway_stage" "this" {
+  provider = aws.aws
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  deployment_id = aws_api_gateway_deployment.this.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+  stage_name    = "development"
+}
 
-# resource "aws_api_gateway_stage" "this" {
-#   provider = aws.aws
+# Monitor all API Gateway resources for changes
+resource "aws_api_gateway_method_settings" "general_settings" {
+  provider = aws.aws
+  count    = length(local.apigateway.logging_levels)
 
-#   deployment_id = aws_api_gateway_deployment.this.id
-#   rest_api_id   = aws_api_gateway_rest_api.this.id
-#   stage_name    = "production"
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  stage_name  = aws_api_gateway_stage.this.stage_name
+  method_path = "*/*"
+
+  settings {
+    # Enable CloudWatch logging and metrics
+    metrics_enabled    = true
+    data_trace_enabled = true
+    logging_level      = local.apigateway.logging_levels[count.index]
+
+    # Limit the rate of calls to prevent abuse and unwanted charges
+    throttling_rate_limit  = 100
+    throttling_burst_limit = 50
+  }
+}
+
+# resource "aws_cloudwatch_log_group" "" {
+#   name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.example.id}/${var.stage_name}"
+#   retention_in_days = 7
 # }

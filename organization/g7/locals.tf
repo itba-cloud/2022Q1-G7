@@ -52,86 +52,87 @@ locals {
       "courses" = {
         "GET" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["getCourses"].invoke_arn
+          uri  = aws_lambda_function.this["getCourses"].invoke_arn
         },
         "POST" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["createCourses"].invoke_arn
+          uri  = aws_lambda_function.this["createCourses"].invoke_arn
         },
       },
       "profiles" = {
         "GET" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["getProfiles"].invoke_arn
+          uri  = aws_lambda_function.this["getProfiles"].invoke_arn
         },
         "POST" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["createProfiles"].invoke_arn
+          uri  = aws_lambda_function.this["createProfiles"].invoke_arn
         },
       },
       "threads" = {
         "GET" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["getThreads"].invoke_arn
+          uri  = aws_lambda_function.this["getThreads"].invoke_arn
         },
         "POST" = {
           type = "AWS_PROXY"
-          uri  = module.lambda["createThreads"].invoke_arn
-        },
-      },
-      "courses_by_id" = {
-        "GET" = {
-          type = "AWS_PROXY"
-          uri  = module.lambda["getCoursesById"].invoke_arn
-          request_parameters = {
-             "method.request.path.courseId" = true
-          }
-        },
-        "POST" = {
-          type = "AWS_PROXY"
-          uri  = module.lambda["createCoursesById"].invoke_arn
-          request_parameters = {
-             "method.request.path.courseId" = true
-          }
+          uri  = aws_lambda_function.this["createThreads"].invoke_arn
         },
       },
     }
 
+    logging_levels = ["INFO", "ERROR"]
   }
 
   lambdas = {
     "getCourses" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_get_courses.py.zip"
       principal = "apigateway"
+      handler = "lambda_get_courses"
+      resource = "courses"
+      method = "GET"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createCourses" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_post_courses.py.zip"
       principal = "apigateway"
+      handler = "lambda_post_courses"
+      resource = "courses"
+      method = "POST"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "getProfiles" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_get_profiles.py.zip"
       principal = "apigateway"
+      handler = "lambda_get_profiles"
+      resource = "profiles"
+      method = "GET"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createProfiles" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_post_profiles.py.zip"
       principal = "apigateway"
+      handler = "lambda_post_profiles"
+      resource = "profiles"
+      method = "POST"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "getThreads" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_get_threads.py.zip"
       principal = "apigateway"
+      handler = "lambda_get_threads"
+      resource = "threads"
+      method = "GET"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createThreads" = {
-      path      = "lambda/lambda.zip"
+      path      = "lambda/lambda_post_threads.py.zip"
       principal = "apigateway"
-    },
-    "getCoursesById" = {
-      path      = "lambda/lambda.zip"
-      principal = "apigateway"
-    },
-    "createCoursesById" = {
-      path      = "lambda/lambda.zip"
-      principal = "apigateway"
-    },
+      handler = "lambda_post_threads"
+      resource = "threads"
+      method = "POST"
+      #source_arn = aws_api_gateway_stage.this.execution_arn
+    }
   }
 }
 

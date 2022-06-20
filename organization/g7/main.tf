@@ -7,7 +7,7 @@ module "vpc" {
     aws = aws.aws
   }
 
-  source  = "../../modules/vpc_4.0"
+  source  = "../../modules/vpc"
   cidr    = each.value.cidr
   subnets = each.value.subnets
   tags = {
@@ -16,7 +16,7 @@ module "vpc" {
 }
 
 module "presentation" {
-  source = "../../modules/presentation_4.0"
+  source = "../../modules/presentation"
 
   providers = {
     aws = aws.aws
@@ -26,21 +26,9 @@ module "presentation" {
   objects      = local.website.objects
 }
 
-module "lambda"{
-  for_each = local.lambdas
-  source = "../../modules/lambda_4.0"
-
-  providers = {
-    aws = aws.aws
-  }
-
-  name = each.key
-  path = each.value.path
-  principal = each.value.principal
-}
 
 # module "dynamodb" {
-#   source = "../../modules/dynambodb_4.0"
+#   source = "../../modules/dynambodb"
 
 #   name        = "users"
 #   hash_key    = "id"
