@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------
-# ECS Task definition variables
+# ECS variables
 # ------------------------------------------------------------------------
 variable "container_cpu" {
   type        = string
@@ -12,9 +12,9 @@ variable "container_memory" {
 }
 
 variable "task_definition_tags" {
-  type        = list(any)
+  type        = map(string)
   description = "Tags to be applied to the task definition"
-  default     = []
+  default     = {}
 }
 
 variable "task_role_arn" {
@@ -26,34 +26,35 @@ variable "execution_role_arn" {
   type        = string
   description = "ARN of the execution role"
 }
-# ------------------------------------------------------------------------
-# ECS Cluster variables
-# ------------------------------------------------------------------------
-variable "cluster_name" {
-  type        = string
-  description = "Name of the cluster"
-}
 
 variable "cluster_tags" {
-  type        = list(any)
+  type        = map(string)
   description = "Tags to be applied to the cluster"
-  default     = []
+  default     = {}
 }
-# ------------------------------------------------------------------------
-# ECS Service variables
-# ------------------------------------------------------------------------
+
 variable "services" {
-  type = map(object({
-    "name"            = string
-    "image"           = string
-    "desiredCount"   = integer
-    "containerPort"   = integer
-    "hostPort"        = integer
+  type = list(object({
+    name          = string
+    image         = string
+    replicas      = number
+    containerPort = number
   }))
   description = "Name of the service"
 }
 
-variable "container_count" {
+
+variable "name" {
   type        = string
-  description = "Number of containers to be deployed"
+  description = "Name of the service"
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID"
+}
+
+variable "subnet_ids" {
+  type        = list(any)
+  description = "Subnets ids to be used for the service"
 }

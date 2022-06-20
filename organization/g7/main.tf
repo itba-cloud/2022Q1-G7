@@ -15,29 +15,53 @@ module "vpc" {
   }
 }
 
-module "presentation" {
-  source = "../../modules/presentation_4.0"
+module "ecs" {
 
-  providers = {
-    aws = aws.aws
-  }
+  depends_on = [
+    module.vpc
+  ]
 
-  website_name = local.website.name
-  objects      = local.website.objects
+  source             = "../../modules/ecs_4.0"
+  name               = "${local.organization}-ecs"
+  container_cpu      = "256"
+  container_memory   = "512"
+  task_role_arn      = "arn:aws:iam::974558964901:role/LabRole"
+  execution_role_arn = "arn:aws:iam::974558964901:role/LabRole"
+  services = [
+    {
+      name          = "ecs-service-1"
+      image         = "strm/helloworld-http"
+      replicas      = 3
+      containerPort = 80
+    }
+  ]
+  vpc_id     = module.vpc["vpc-1"].vpc_id
+  subnet_ids = values(module.vpc["vpc-1"].subnet_ids)
 }
 
-module "lambda"{
-  for_each = local.lambdas
-  source = "../../modules/lambda_4.0"
+# module "presentation" {
+#   source = "../../modules/presentation_4.0"
 
-  providers = {
-    aws = aws.aws
-  }
+#   providers = {
+#     aws = aws.aws
+#   }
 
-  name = each.key
-  path = each.value.path
-  principal = each.value.principal
-}
+#   website_name = local.website.name
+#   objects      = local.website.objects
+# }
+
+# module "lambda"{
+#   for_each = local.lambdas
+#   source = "../../modules/lambda_4.0"
+
+#   providers = {
+#     aws = aws.aws
+#   }
+
+#   name = each.key
+#   path = each.value.path
+#   principal = each.value.principal
+# }
 
 # module "dynamodb" {
 #   source = "../../modules/dynambodb_4.0"
