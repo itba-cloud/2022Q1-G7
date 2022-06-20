@@ -1,5 +1,6 @@
 locals {
-  region = "us-east-1"
+  region       = "us-east-1"
+  organization = "itba-cloud-g7"
   vpcs = {
     "vpc-1" = {
       cidr = "10.0.0.0/22"
@@ -22,7 +23,7 @@ locals {
   }
 
   website = {
-    name = "dev-itba-cloud-g7"
+    name = "${local.organization}-web"
     objects = {
       index = {
         filename     = "html/index.html"
@@ -44,5 +45,93 @@ locals {
 
   }
 
+  apigateway = {
+    name = "${local.organization}-apigateway"
+
+    resources = {
+      "courses" = {
+        "GET" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["getCourses"].invoke_arn
+        },
+        "POST" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["createCourses"].invoke_arn
+        },
+      },
+      "profiles" = {
+        "GET" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["getProfiles"].invoke_arn
+        },
+        "POST" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["createProfiles"].invoke_arn
+        },
+      },
+      "threads" = {
+        "GET" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["getThreads"].invoke_arn
+        },
+        "POST" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["createThreads"].invoke_arn
+        },
+      },
+      "courses_by_id" = {
+        "GET" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["getCoursesById"].invoke_arn
+          request_parameters = {
+             "method.request.path.courseId" = true
+          }
+        },
+        "POST" = {
+          type = "AWS_PROXY"
+          uri  = module.lambda["createCoursesById"].invoke_arn
+          request_parameters = {
+             "method.request.path.courseId" = true
+          }
+        },
+      },
+    }
+
+  }
+
+  lambdas = {
+    "getCourses" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "createCourses" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "getProfiles" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "createProfiles" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "getThreads" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "createThreads" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "getCoursesById" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+    "createCoursesById" = {
+      path      = "lambda/lambda.zip"
+      principal = "apigateway"
+    },
+  }
 }
 

@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "this" {
 
 }
 resource "aws_s3_bucket" "logs" {
-  bucket = "${var.website_name}.logs"
+  bucket = "logs.${var.website_name}"
 }
 
 # 2 -Bucket policy
@@ -45,7 +45,7 @@ resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
 
   redirect_all_requests_to {
-    host_name = "${var.website_name}.s3-website-${var.region}.amazonaws.com"
+    host_name = "${var.website_name}.s3-website-${data.aws_region.current.name}.amazonaws.com"
   }
 }
 
