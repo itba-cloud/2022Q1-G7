@@ -23,6 +23,7 @@ module "presentation" {
   }
 
   website_name = local.website.name
+  region = local.region
   objects      = local.website.objects
 }
 

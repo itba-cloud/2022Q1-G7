@@ -1,4 +1,5 @@
 locals {
+  region = "us-east-1"
   vpcs = {
     "vpc-1" = {
       cidr = "10.0.0.0/22"
@@ -21,7 +22,7 @@ locals {
   }
 
   website = {
-    name = "itba-cloud-g7"
+    name = "dev-itba-cloud-g7"
     objects = {
       index = {
         filename     = "html/index.html"

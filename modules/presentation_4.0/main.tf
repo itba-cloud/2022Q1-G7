@@ -33,7 +33,7 @@ resource "aws_s3_bucket_acl" "www" {
 
 resource "aws_s3_bucket_acl" "this" {
   bucket = aws_s3_bucket.this.id
-  acl    = "private"
+  acl    = "public-read"
 }
 
 resource "aws_s3_bucket_acl" "logs" {
@@ -45,8 +45,7 @@ resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
 
   redirect_all_requests_to {
-    host_name = aws_s3_bucket.this.website_endpoint
-    protocol = "http"
+    host_name = "${var.website_name}.s3-website-${var.region}.amazonaws.com"
   }
 }
 
