@@ -5,12 +5,24 @@ module "vpc" {
 
   providers = {
     aws = aws.aws
-   }
+  }
 
-  source   = "../../modules/vpc_4.0"
+  source  = "../../modules/vpc_4.0"
   cidr    = each.value.cidr
   subnets = each.value.subnets
   tags = {
     Name = each.key
   }
 }
+
+module "presentation" {
+  source = "../../modules/presentation_4.0"
+
+  providers = {
+    aws = aws.aws
+  }
+
+  website_name = local.website.name
+  objects      = local.website.objects
+}
+

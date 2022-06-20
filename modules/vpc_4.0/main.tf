@@ -22,6 +22,8 @@ resource "aws_subnet" "private" {
   cidr_block        = each.value.cidr
   availability_zone = each.value.az
 
+
+
   tags = merge(
     {
       "Name" = format(
@@ -29,7 +31,6 @@ resource "aws_subnet" "private" {
         each.key,
       )
     },
-    var.tags,
-    var.private_subnet_tags,
+
   )
 }
