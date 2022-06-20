@@ -14,7 +14,60 @@ locals {
           cidr = "10.0.2.0/24"
           az   = "us-east-1b"
         },
-
+      },
+      network_acl = {
+        ingress = {
+          "rule-100" = {
+            from_port   = 80,
+            protocol    = "tcp",
+            rule_number = 100,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.1.0/24"
+          },
+          "rule-101" = {
+            from_port   = 80,
+            protocol    = "tcp",
+            rule_number = 101,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.2.0/24"
+          },
+          "rule-200" = {
+            from_port   = 443,
+            protocol    = "tcp",
+            rule_number = 200,
+            to_port     = 443,
+            rule_action = "allow",
+            cidr_block  = "10.0.1.0/24"
+          },
+          "rule-201" = {
+            from_port   = 443,
+            protocol    = "tcp",
+            rule_number = 201,
+            to_port     = 443,
+            rule_action = "allow",
+            cidr_block  = "10.0.2.0/24"
+          }
+        },
+        egress = {
+          "rule-100" = {
+            from_port   = 0,
+            protocol    = -1,
+            rule_number = 100,
+            to_port     = 0,
+            rule_action = "allow",
+            cidr_block  = "10.0.1.0/24"
+          }
+          "rule-101" = {
+            from_port   = 0,
+            protocol    = -1,
+            rule_number = 101,
+            to_port     = 0,
+            rule_action = "allow",
+            cidr_block  = "10.0.2.0/24"
+          }
+        }
       }
       tags = {
 
@@ -88,51 +141,80 @@ locals {
     "getCourses" = {
       path      = "lambda/lambda_get_courses.py.zip"
       principal = "apigateway"
-      handler = "lambda_get_courses"
-      resource = "courses"
-      method = "GET"
+      handler   = "lambda_get_courses"
+      resource  = "courses"
+      method    = "GET"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createCourses" = {
       path      = "lambda/lambda_post_courses.py.zip"
       principal = "apigateway"
-      handler = "lambda_post_courses"
-      resource = "courses"
-      method = "POST"
+      handler   = "lambda_post_courses"
+      resource  = "courses"
+      method    = "POST"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "getProfiles" = {
       path      = "lambda/lambda_get_profiles.py.zip"
       principal = "apigateway"
-      handler = "lambda_get_profiles"
-      resource = "profiles"
-      method = "GET"
+      handler   = "lambda_get_profiles"
+      resource  = "profiles"
+      method    = "GET"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createProfiles" = {
       path      = "lambda/lambda_post_profiles.py.zip"
       principal = "apigateway"
-      handler = "lambda_post_profiles"
-      resource = "profiles"
-      method = "POST"
+      handler   = "lambda_post_profiles"
+      resource  = "profiles"
+      method    = "POST"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "getThreads" = {
       path      = "lambda/lambda_get_threads.py.zip"
       principal = "apigateway"
-      handler = "lambda_get_threads"
-      resource = "threads"
-      method = "GET"
+      handler   = "lambda_get_threads"
+      resource  = "threads"
+      method    = "GET"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },
     "createThreads" = {
       path      = "lambda/lambda_post_threads.py.zip"
       principal = "apigateway"
-      handler = "lambda_post_threads"
-      resource = "threads"
-      method = "POST"
+      handler   = "lambda_post_threads"
+      resource  = "threads"
+      method    = "POST"
       #source_arn = aws_api_gateway_stage.this.execution_arn
     }
   }
-}
 
+  dynambodb = {
+    "users" = {
+      key = "id"
+      attributes = [
+        { name = "id", type = "S" },
+        { name = "name", type = "S" },
+      ]
+      read_capacity  = 1
+      write_capacity = 1
+    }
+    "courses" = {
+      key = "id"
+      attributes = [
+        { name = "id", type = "S" },
+        { name = "name", type = "S" },
+      ]
+      read_capacity  = 1
+      write_capacity = 1
+    }
+    "recordings" = {
+      key = "id"
+      attributes = [
+        { name = "id", type = "S" },
+        { name = "name", type = "S" },
+      ]
+      read_capacity  = 1
+      write_capacity = 1
+    }
+  }
+}

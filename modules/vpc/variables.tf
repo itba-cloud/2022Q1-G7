@@ -19,6 +19,28 @@ variable "subnets" {
   default = {}
 }
 
+variable "network_acl" {
+  description = "The network ACL to create in the VPC. Default value is an empty list, but should be overridden"
+  type = object({
+    egress = map(object({
+      from_port   = number,
+      protocol    = any,
+      rule_number = number,
+      to_port     = number,
+      rule_action = string,
+      cidr_block  = string,
+    })),
+    ingress = map(object({
+      from_port   = number,
+      protocol    = any,
+      rule_number = number,
+      to_port     = number,
+      rule_action = string,
+      cidr_block  = string,
+    })),
+  })
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
@@ -33,6 +55,12 @@ variable "vpc_tags" {
 
 variable "private_subnet_tags" {
   description = "Additional tags for the private subnet"
+  type        = map(string)
+  default     = {}
+}
+
+variable "network_acl_tags" {
+  description = "Additional tags for the network ACL"
   type        = map(string)
   default     = {}
 }
