@@ -5,13 +5,13 @@ module "vpc" {
     aws = aws.aws
   }
 
-  source      = "../../modules/vpc"
-  cidr        = each.value.cidr
-  private_subnets     = each.value.private_subnets
-  public_subnets     = each.value.public_subnets
-  network_acl = each.value.network_acl
+  source           = "../../modules/vpc"
+  cidr             = each.value.cidr
+  private_subnets  = each.value.private_subnets
+  public_subnets   = each.value.public_subnets
+  network_acl      = each.value.network_acl
   network_acl_tags = each.value.network_acl.tags
-  vpc_tags        = each.value.tags
+  vpc_tags         = each.value.tags
 
 }
 
@@ -61,6 +61,6 @@ module "presentation" {
   objects      = local.website.objects
 
   www_bucket_tags = local.website.www_tags
-  bucket_tags = local.website.official_tags
+  bucket_tags     = local.website.official_tags
   bucket_log_tags = local.website.log_tags
 }

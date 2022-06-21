@@ -92,10 +92,10 @@ module "services_alb" {
   subnet_ids = var.subnet_ids
 
   security_group_tags = var.alb_tags.security_group_tags
-  load_balancer_tags = var.alb_tags.load_balancer_tags
-  target_group_tags = var.alb_tags.target_group_tags
-  listener_tags = var.alb_tags.listener_tags
-  tags = var.alb_tags.tags
+  load_balancer_tags  = var.alb_tags.load_balancer_tags
+  target_group_tags   = var.alb_tags.target_group_tags
+  listener_tags       = var.alb_tags.listener_tags
+  tags                = var.alb_tags.tags
 }
 
 # resource "aws_ecs_service" "this" {
