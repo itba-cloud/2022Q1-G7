@@ -23,20 +23,20 @@ locals {
       },
 
       public_subnets = {
-        # "subnet-1-public" = {
-        #   cidr = "10.0.3.0/24"
-        #   az   = "us-east-1a"
-        #   tags = {
+        "subnet-1-public" = {
+          cidr = "10.0.3.0/24"
+          az   = "us-east-1a"
+          tags = {
 
-        #   }
-        # },
-        # "subnet-2-public" = {
-        #   cidr = "10.0.4.0/24"
-        #   az   = "us-east-1b"
-        #   tags = {
+          }
+        },
+        "subnet-2-public" = {
+          cidr = "10.0.4.0/24"
+          az   = "us-east-1b"
+          tags = {
 
-        #   }
-        # }
+          }
+        }
       },
       network_acl = {
         ingress = {
@@ -56,22 +56,22 @@ locals {
             rule_action = "allow",
             cidr_block  = "10.0.2.0/24"
           },
-          # "rule-102" = {
-          #   from_port   = 80,
-          #   protocol    = "tcp",
-          #   rule_number = 102,
-          #   to_port     = 80,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.3.0/24"
-          # },
-          # "rule-103" = {
-          #   from_port   = 80,
-          #   protocol    = "tcp",
-          #   rule_number = 103,
-          #   to_port     = 80,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.4.0/24"
-          # },
+          "rule-102" = {
+            from_port   = 80,
+            protocol    = "tcp",
+            rule_number = 102,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.3.0/24"
+          },
+          "rule-103" = {
+            from_port   = 80,
+            protocol    = "tcp",
+            rule_number = 103,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.4.0/24"
+          },
           "rule-200" = {
             from_port   = 443,
             protocol    = "tcp",
@@ -88,22 +88,22 @@ locals {
             rule_action = "allow",
             cidr_block  = "10.0.2.0/24"
           }
-          # "rule-202" = {
-          #   from_port   = 443,
-          #   protocol    = "tcp",
-          #   rule_number = 202,
-          #   to_port     = 443,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.3.0/24"
-          # },
-          # "rule-203" = {
-          #   from_port   = 443,
-          #   protocol    = "tcp",
-          #   rule_number = 203,
-          #   to_port     = 443,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.4.0/24"
-          # }
+          "rule-202" = {
+            from_port   = 443,
+            protocol    = "tcp",
+            rule_number = 202,
+            to_port     = 443,
+            rule_action = "allow",
+            cidr_block  = "10.0.3.0/24"
+          },
+          "rule-203" = {
+            from_port   = 443,
+            protocol    = "tcp",
+            rule_number = 203,
+            to_port     = 443,
+            rule_action = "allow",
+            cidr_block  = "10.0.4.0/24"
+          }
         },
         egress = {
           "rule-100" = {
@@ -122,22 +122,22 @@ locals {
             rule_action = "allow",
             cidr_block  = "10.0.2.0/24"
           }
-          # "rule-102" = {
-          #   from_port   = 0,
-          #   protocol    = -1,
-          #   rule_number = 102,
-          #   to_port     = 0,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.3.0/24"
-          # }
-          # "rule-103" = {
-          #   from_port   = 0,
-          #   protocol    = -1,
-          #   rule_number = 104,
-          #   to_port     = 0,
-          #   rule_action = "allow",
-          #   cidr_block  = "10.0.4.0/24"
-          # }
+          "rule-102" = {
+            from_port   = 0,
+            protocol    = -1,
+            rule_number = 102,
+            to_port     = 0,
+            rule_action = "allow",
+            cidr_block  = "10.0.3.0/24"
+          }
+          "rule-103" = {
+            from_port   = 0,
+            protocol    = -1,
+            rule_number = 104,
+            to_port     = 0,
+            rule_action = "allow",
+            cidr_block  = "10.0.4.0/24"
+          }
         },
         tags = {
 
