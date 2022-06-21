@@ -4,7 +4,9 @@ resource "aws_nat_gateway" "main" {
   subnet_id     = element(values(aws_subnet.public), count.index).id
   depends_on    = [aws_internet_gateway.this]
   tags = merge(
-    map("Name", format("%s-%s", var.name, count.index)),
+    {
+      Name = "${var.name}-${count.index}"
+    },
     var.tags,
     var.nat_gateway_tags
   )

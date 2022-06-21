@@ -3,7 +3,7 @@ locals {
   organization = "itba-cloud-g7"
   vpcs = {
     "vpc-1" = {
-      cidr = "10.0.0.0/22"
+      cidr = "10.0.0.0/20"
 
       private_subnets = {
         "subnet-1-private" = {
