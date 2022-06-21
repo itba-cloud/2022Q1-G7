@@ -10,11 +10,22 @@ variable "cidr" {
   default     = "0.0.0.0/0"
 }
 
-variable "subnets" {
+variable "private_subnets" {
   description = "The subnets to create in the VPC. Each subnet must have a CIDR block, an availability zone, and a name. Default value is an empty list, but should be overridden"
   type = map(object({
     cidr = string,
     az   = string,
+    tags = map(string),
+  }))
+  default = {}
+}
+
+variable "public_subnets" {
+  description = "The subnets to create in the VPC. Each subnet must have a CIDR block, an availability zone, and a name. Default value is an empty list, but should be overridden"
+  type = map(object({
+    cidr = string,
+    az   = string,
+    tags = map(string),
   }))
   default = {}
 }
@@ -53,14 +64,20 @@ variable "vpc_tags" {
   default     = {}
 }
 
-variable "private_subnet_tags" {
-  description = "Additional tags for the private subnet"
+variable "network_acl_tags" {
+  description = "Additional tags for the network ACL"
   type        = map(string)
   default     = {}
 }
 
-variable "network_acl_tags" {
-  description = "Additional tags for the network ACL"
+variable "nat_gateway_tags" {
+  description = "Additional tags for the NAT Gateway"
+  type        = map(string)
+  default     = {}
+}
+
+variable "igw_tags" {
+  description = "Additional tags for the Internet Gateway"
   type        = map(string)
   default     = {}
 }

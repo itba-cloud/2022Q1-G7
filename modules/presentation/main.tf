@@ -5,14 +5,34 @@
 # 1 - S3 bucket
 resource "aws_s3_bucket" "www" {
   bucket = "www.${var.website_name}"
+  tags = merge(
+    {
+      "Name" = "www.${var.website_name}"
+    },
+    var.tags,
+    var.www_bucket_tags
+  )
 }
 
 resource "aws_s3_bucket" "this" {
   bucket = var.website_name
-
+  tags = merge(
+    {
+      "Name" = var.website_name
+    },
+    var.tags,
+    var.bucket_tags
+  )
 }
 resource "aws_s3_bucket" "logs" {
   bucket = "logs.${var.website_name}"
+  tags = merge(
+    {
+      "Name" = "${var.website_name}-logs"
+    },
+    var.tags,
+    var.bucket_log_tags
+  )
 }
 
 # 2 -Bucket policy

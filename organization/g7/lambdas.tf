@@ -18,7 +18,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = each.key
 
-  principal = "${each.value.principal}.amazonaws.com"
+  principal  = "${each.value.principal}.amazonaws.com"
   source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.this.id}/*/${each.value.method}/${each.value.resource}"
   #source_arn = "${aws_api_gateway_stage.this.execution_arn}/${each.value.method}/${each.value.resource}"
   #source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.this.id}"

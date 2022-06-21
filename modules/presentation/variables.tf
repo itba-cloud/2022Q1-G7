@@ -12,3 +12,27 @@ variable "objects" {
   description = ""
   default     = {}
 }
+
+variable "www_bucket_tags" {
+  type        = map(string)
+  description = "Tags for the www website bucket."
+  default     = {}
+}
+
+variable "bucket_tags" {
+  type        = map(string)
+  description = "Tags for the official website bucket."
+  default     = {}
+}
+
+variable "bucket_log_tags" {
+  type        = map(string)
+  description = "Tags for the logs website bucket."
+  default     = {}
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags for all the buckets."
+  default     = {}
+}

@@ -11,13 +11,23 @@ resource "aws_vpc" "this" {
   )
 }
 
+################################################################################
+# Public subnet
+################################################################################
+resource "aws_subnet" "public" {
+  for_each                = var.public_subnets
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = each.value.cidr
+  availability_zone       = each.value.az
+  map_public_ip_on_launch = true
+}
 
 ################################################################################
 # Private subnet
 ################################################################################
 
 resource "aws_subnet" "private" {
-  for_each          = var.subnets
+  for_each          = var.private_subnets
   vpc_id            = aws_vpc.this.id
   cidr_block        = each.value.cidr
   availability_zone = each.value.az
@@ -30,7 +40,7 @@ resource "aws_subnet" "private" {
       )
     },
     var.tags,
-    var.private_subnet_tags
+    each.value.tags
   )
 }
 
@@ -61,17 +71,17 @@ resource "aws_network_acl" "this" {
     }
   }
 
-    tags = merge(
+  tags = merge(
     {
       "Name" = "${var.name}-private"
     },
     var.tags,
-    var.private_subnet_tags
+    var.network_acl_tags
   )
 }
 
-resource "aws_network_acl_association" "main" {
-  for_each       = var.subnets
+resource "aws_network_acl_association" "private" {
+  for_each       = var.private_subnets
   network_acl_id = aws_network_acl.this.id
   subnet_id      = aws_subnet.private[each.key].id
 }

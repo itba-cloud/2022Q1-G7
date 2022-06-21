@@ -15,13 +15,13 @@ resource "aws_dynamodb_table" "this" {
   read_capacity  = each.value.read_capacity
   write_capacity = each.value.write_capacity
   dynamic "global_secondary_index" {
-    for_each = [ for attr in each.value.attributes: attr if attr.name != each.value.key ]
+    for_each = [for attr in each.value.attributes : attr if attr.name != each.value.key]
     content {
-      name            = global_secondary_index.value.name
-      hash_key        = global_secondary_index.value.name
-      projection_type = "INCLUDE"
-      write_capacity  = 1
-      read_capacity   = 1
+      name               = global_secondary_index.value.name
+      hash_key           = global_secondary_index.value.name
+      projection_type    = "INCLUDE"
+      write_capacity     = 1
+      read_capacity      = 1
       non_key_attributes = [each.value.key]
     }
   }

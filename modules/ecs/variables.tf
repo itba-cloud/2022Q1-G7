@@ -37,6 +37,7 @@ variable "services" {
   type = list(object({
     name          = string
     image         = string
+    location      = string
     replicas      = number
     containerPort = number
   }))
@@ -57,4 +58,34 @@ variable "vpc_id" {
 variable "subnet_ids" {
   type        = list(any)
   description = "Subnets ids to be used for the service"
+}
+
+variable "security_group_tags" {
+  type        = map(string)
+  description = "Tags to be applied to the security group"
+  default     = {}
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to be applied to the service"
+  default     = {}
+}
+
+variable "alb_tags" {
+  type = object({
+    listener_tags       = map(string),
+    target_group_tags   = map(string),
+    load_balancer_tags  = map(string),
+    security_group_tags = map(string),
+    tags                = map(string),
+  })
+  description = "Tags to be applied to the ALB"
+  default = {
+    listener_tags       = {},
+    target_group_tags   = {},
+    load_balancer_tags  = {},
+    security_group_tags = {},
+    tags                = {},
+  }
 }
