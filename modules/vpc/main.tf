@@ -14,13 +14,13 @@ resource "aws_vpc" "this" {
 ################################################################################
 # Public subnet
 ################################################################################
-resource "aws_subnet" "public" {
-  for_each                = var.public_subnets
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = each.value.cidr
-  availability_zone       = each.value.az
-  map_public_ip_on_launch = true
-}
+# resource "aws_subnet" "public" {
+#   for_each                = var.public_subnets
+#   vpc_id                  = aws_vpc.this.id
+#   cidr_block              = each.value.cidr
+#   availability_zone       = each.value.az
+#   map_public_ip_on_launch = true
+# }
 
 ################################################################################
 # Private subnet
