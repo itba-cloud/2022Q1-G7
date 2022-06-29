@@ -11,8 +11,8 @@ resource "aws_nat_gateway" "main" {
     var.nat_gateway_tags
   )
 }
- 
+
 resource "aws_eip" "nat" {
   count = length(values(var.private_subnets))
-  vpc = true
+  vpc   = true
 }

@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "this" {
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
-  count = length(var.services)
+  count      = length(var.services)
   repository = aws_ecr_repository.this[count.index].name
 
   policy = jsonencode({

@@ -335,21 +335,21 @@ locals {
     },
     alb = {
       tags = {
-              security_group_tags = {
+        security_group_tags = {
 
-      },
-      load_balancer_tags = {
+        },
+        load_balancer_tags = {
 
-      },
-      target_group_tags = {
+        },
+        target_group_tags = {
 
-      },
-      listener_tags = {
+        },
+        listener_tags = {
 
-      },
-      tags = {
+        },
+        tags = {
 
-      }
+        }
       }
     }
 
