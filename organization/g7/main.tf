@@ -1,19 +1,19 @@
-# module "vpc" {
-#   for_each = local.vpcs
+module "vpc" {
+  for_each = local.vpcs
 
-#   providers = {
-#     aws = aws.aws
-#   }
+  providers = {
+    aws = aws.aws
+  }
 
-#   source           = "../../modules/vpc"
-#   cidr             = each.value.cidr
-#   private_subnets  = each.value.private_subnets
-#   public_subnets   = each.value.public_subnets
-#   network_acl      = each.value.network_acl
-#   network_acl_tags = each.value.network_acl.tags
-#   vpc_tags         = each.value.tags
+  source           = "../../modules/vpc"
+  cidr             = each.value.cidr
+  private_subnets  = each.value.private_subnets
+  public_subnets   = each.value.public_subnets
+  network_acl      = each.value.network_acl
+  network_acl_tags = each.value.network_acl.tags
+  vpc_tags         = each.value.tags
 
-# }
+}
 
 # module "ecs" {
 
@@ -50,25 +50,25 @@
 
 # }
 
-# module "presentation" {
-#   source = "../../modules/presentation"
+module "presentation" {
+  source = "../../modules/presentation"
 
-#   providers = {
-#     aws = aws.aws
-#   }
-
-#   website_name = local.website.name
-#   objects      = local.website.objects
-
-#   www_bucket_tags = local.website.www_tags
-#   bucket_tags     = local.website.official_tags
-#   bucket_log_tags = local.website.log_tags
-# }
-
-
-module "chat" {
-  source = "../../modules/chat"
   providers = {
     aws = aws.aws
   }
+
+  website_name = local.website.name
+  objects      = local.website.objects
+
+  www_bucket_tags = local.website.www_tags
+  bucket_tags     = local.website.official_tags
+  bucket_log_tags = local.website.log_tags
 }
+
+
+# module "chat" {
+#   source = "../../modules/chat"
+#   providers = {
+#     aws = aws.aws
+#   }
+# }
