@@ -1,6 +1,6 @@
 locals {
   region       = "us-east-1"
-  organization = "itba-cloud-g7"
+  organization = "final-cloud-g7"
 
   cognito = {
     name = "${local.organization}-cognito"
@@ -155,7 +155,7 @@ locals {
   }
 
   website = {
-    name = "${local.organization}-web"
+    name = "${local.organization}-web.aleph51.com.ar"
     objects = {
       index = {
         filename     = "html/index.html"
