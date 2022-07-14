@@ -44,7 +44,6 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions = jsonencode([{
     name  = "${var.services[count.index].name}-container"
     image = "${aws_ecr_repository.this[count.index].repository_url}:latest"
-    #image     = "${var.services[count.index].image}"
     essential = true
     portMappings = [{
       containerPort = var.services[count.index].containerPort

@@ -20,6 +20,16 @@ resource "aws_subnet" "public" {
   cidr_block              = each.value.cidr
   availability_zone       = each.value.az
   map_public_ip_on_launch = true
+  tags = merge(
+    {
+      "Name" = format(
+        "${var.name}-public-%s",
+        each.key,
+      )
+    },
+    var.tags,
+    each.value.tags
+  )
 }
 
 ################################################################################

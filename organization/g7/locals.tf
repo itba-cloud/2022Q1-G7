@@ -3,7 +3,7 @@ locals {
   organization = "final-cloud-g7"
 
   cognito = {
-    name = "${local.organization}-cognito"
+    name   = "${local.organization}-cognito"
     domain = "${local.organization}-auth-domain"
   }
   vpcs = {
@@ -46,100 +46,44 @@ locals {
       network_acl = {
         ingress = {
           "rule-100" = {
-            from_port   = 80,
+            from_port   = 1024,
             protocol    = "tcp",
             rule_number = 100,
-            to_port     = 80,
+            to_port     = 65535,
             rule_action = "allow",
-            cidr_block  = "10.0.1.0/24"
+            cidr_block  = "0.0.0.0/0"
           },
-          "rule-101" = {
-            from_port   = 80,
-            protocol    = "tcp",
-            rule_number = 101,
-            to_port     = 80,
-            rule_action = "allow",
-            cidr_block  = "10.0.2.0/24"
-          },
-          "rule-102" = {
-            from_port   = 80,
-            protocol    = "tcp",
-            rule_number = 102,
-            to_port     = 80,
-            rule_action = "allow",
-            cidr_block  = "10.0.3.0/24"
-          },
-          "rule-103" = {
-            from_port   = 80,
-            protocol    = "tcp",
-            rule_number = 103,
-            to_port     = 80,
-            rule_action = "allow",
-            cidr_block  = "10.0.4.0/24"
-          },
-          "rule-200" = {
-            from_port   = 443,
-            protocol    = "tcp",
-            rule_number = 200,
-            to_port     = 443,
-            rule_action = "allow",
-            cidr_block  = "10.0.1.0/24"
-          },
-          "rule-201" = {
-            from_port   = 443,
-            protocol    = "tcp",
-            rule_number = 201,
-            to_port     = 443,
-            rule_action = "allow",
-            cidr_block  = "10.0.2.0/24"
-          }
-          "rule-202" = {
-            from_port   = 443,
-            protocol    = "tcp",
-            rule_number = 202,
-            to_port     = 443,
-            rule_action = "allow",
-            cidr_block  = "10.0.3.0/24"
-          },
-          "rule-203" = {
-            from_port   = 443,
-            protocol    = "tcp",
-            rule_number = 203,
-            to_port     = 443,
-            rule_action = "allow",
-            cidr_block  = "10.0.4.0/24"
-          }
         },
         egress = {
           "rule-100" = {
-            from_port   = 0,
-            protocol    = -1,
+            from_port   = 80,
+            protocol    = "tcp",
             rule_number = 100,
-            to_port     = 0,
+            to_port     = 80,
             rule_action = "allow",
-            cidr_block  = "10.0.1.0/24"
+            cidr_block  = "0.0.0.0/0"
           }
           "rule-101" = {
-            from_port   = 0,
-            protocol    = -1,
+            from_port   = 443,
+            protocol    = "tcp",
             rule_number = 101,
-            to_port     = 0,
+            to_port     = 443,
             rule_action = "allow",
-            cidr_block  = "10.0.2.0/24"
+            cidr_block  = "0.0.0.0/0"
           }
           "rule-102" = {
-            from_port   = 0,
-            protocol    = -1,
+            from_port   = 1024,
+            protocol    = "tcp",
             rule_number = 102,
-            to_port     = 0,
+            to_port     = 65535,
             rule_action = "allow",
             cidr_block  = "10.0.3.0/24"
-          }
+          },
           "rule-103" = {
-            from_port   = 0,
-            protocol    = -1,
-            rule_number = 104,
-            to_port     = 0,
+            from_port   = 1024,
+            protocol    = "tcp",
+            rule_number = 103,
+            to_port     = 65535,
             rule_action = "allow",
             cidr_block  = "10.0.4.0/24"
           }
@@ -325,39 +269,39 @@ locals {
     } }
   }
 
-  # ecs = {
-  #   task_definition_tags = {
+  ecs = {
+    task_definition_tags = {
 
-  #   },
-  #   cluster_tags = {
+    },
+    cluster_tags = {
 
-  #   },
-  #   security_group_tags = {
+    },
+    security_group_tags = {
 
-  #   },
-  #   tags = {
+    },
+    tags = {
 
-  #   },
-  #   alb = {
-  #     tags = {
-  #       security_group_tags = {
+    },
+    alb = {
+      tags = {
+        security_group_tags = {
 
-  #       },
-  #       load_balancer_tags = {
+        },
+        load_balancer_tags = {
 
-  #       },
-  #       target_group_tags = {
+        },
+        target_group_tags = {
 
-  #       },
-  #       listener_tags = {
+        },
+        listener_tags = {
 
-  #       },
-  #       tags = {
+        },
+        tags = {
 
-  #       }
-  #     }
-  #   }
+        }
+      }
+    }
 
-  # }
+  }
 
 }
