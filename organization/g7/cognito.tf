@@ -80,8 +80,8 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
   name                                 = local.cognito.name
   user_pool_id                         = aws_cognito_user_pool.pool.id
   generate_secret                      = true
-  callback_urls                        = ["https://www.${module.presentation.website_endpoint}/"]
-  logout_urls                          = ["https://www.${module.presentation.website_endpoint}/"]
+  callback_urls                        = ["https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"]
+  logout_urls                          = ["https://www.${module.presentation.website_endpoint}${local.cognito.logout_url_endpoint}"]
   access_token_validity                = "120"
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
