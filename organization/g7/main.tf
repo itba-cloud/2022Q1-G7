@@ -9,51 +9,50 @@ module "vpc" {
   cidr             = each.value.cidr
   private_subnets  = each.value.private_subnets
   public_subnets   = each.value.public_subnets
-  name             = each.key
   network_acl      = each.value.network_acl
   network_acl_tags = each.value.network_acl.tags
   vpc_tags         = each.value.tags
 
 }
 
-module "ecs" {
+# module "ecs" {
 
-  depends_on = [
-    module.vpc
-  ]
+#   depends_on = [
+#     module.vpc
+#   ]
 
-  providers = {
-    aws = aws.aws
+#   providers = {
+#     aws = aws.aws
+#   }
+
+source             = "../../modules/ecs"
+name               = "${local.organization}-ecs"
+container_cpu      = "256"
+container_memory   = "512"
+task_role_arn      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+execution_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+services = [
+  {
+    name          = "ecs-service-1"
+    image         = "users:latest"
+    location      = "users"
+    replicas      = 3
+    containerPort = 80
   }
+]
+vpc_id             = module.vpc["vpc-1"].vpc_id
+vpc_cidr           = module.vpc["vpc-1"].vpc_cidr
+public_subnet_ids  = values(module.vpc["vpc-1"].public_subnet_ids)
+private_subnet_ids = values(module.vpc["vpc-1"].private_subnet_ids)
 
-  source             = "../../modules/ecs"
-  name               = "${local.organization}-ecs"
-  container_cpu      = "256"
-  container_memory   = "512"
-  task_role_arn      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  execution_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  services = [
-    {
-      name          = "ecs-service-1"
-      image         = "users:latest"
-      location      = "users"
-      replicas      = 3
-      containerPort = 80
-    }
-  ]
-  vpc_id             = module.vpc["vpc-1"].vpc_id
-  vpc_cidr           = module.vpc["vpc-1"].vpc_cidr
-  public_subnet_ids  = values(module.vpc["vpc-1"].public_subnet_ids)
-  private_subnet_ids = values(module.vpc["vpc-1"].private_subnet_ids)
+task_definition_tags = local.ecs.task_definition_tags
+cluster_tags         = local.ecs.cluster_tags
+security_group_tags  = local.ecs.security_group_tags
+public_alb_tags      = local.ecs.alb.tags
+private_alb_tags     = local.ecs.alb.tags
+logs_region          = local.region
 
-  task_definition_tags = local.ecs.task_definition_tags
-  cluster_tags         = local.ecs.cluster_tags
-  security_group_tags  = local.ecs.security_group_tags
-  public_alb_tags      = local.ecs.alb.tags
-  private_alb_tags     = local.ecs.alb.tags
-  logs_region          = local.region
-
-}
+# }
 
 module "presentation" {
   source = "../../modules/presentation"
