@@ -22,6 +22,10 @@ variable "vpc_id" {
   type        = string
   description = "ID of the VPC of the resource"
 }
+variable "vpc_cidr" {
+  type        = string
+  description = "VPC CIDR"
+}
 
 variable "tags" {
   type        = map(string)

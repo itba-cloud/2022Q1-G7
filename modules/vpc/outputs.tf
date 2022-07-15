@@ -3,9 +3,19 @@ output "vpc_id" {
   description = "VPC Id"
 }
 
-output "subnet_ids" {
+output "vpc_cidr" {
+  value       = aws_vpc.this.cidr_block
+  description = "VPC CIDR"
+}
+
+output "public_subnet_ids" {
+  value       = { for az, subnet in aws_subnet.public : az => subnet.id }
+  description = "Public Subnet Ids"
+}
+
+output "private_subnet_ids" {
   value       = { for az, subnet in aws_subnet.private : az => subnet.id }
-  description = "Subnet Ids"
+  description = "Private Subnet Ids"
 }
 
 output "network_acl_id" {

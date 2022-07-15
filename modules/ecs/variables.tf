@@ -55,7 +55,17 @@ variable "vpc_id" {
   description = "VPC ID"
 }
 
-variable "subnet_ids" {
+variable "vpc_cidr" {
+  description = "VPC CIDR"
+  type        = string
+}
+
+variable "public_subnet_ids" {
+  type        = list(any)
+  description = "Subnets ids to be used for the service"
+}
+
+variable "private_subnet_ids" {
   type        = list(any)
   description = "Subnets ids to be used for the service"
 }
@@ -72,7 +82,7 @@ variable "tags" {
   default     = {}
 }
 
-variable "alb_tags" {
+variable "public_alb_tags" {
   type = object({
     listener_tags       = map(string),
     target_group_tags   = map(string),
@@ -88,4 +98,26 @@ variable "alb_tags" {
     security_group_tags = {},
     tags                = {},
   }
+}
+variable "private_alb_tags" {
+  type = object({
+    listener_tags       = map(string),
+    target_group_tags   = map(string),
+    load_balancer_tags  = map(string),
+    security_group_tags = map(string),
+    tags                = map(string),
+  })
+  description = "Tags to be applied to the ALB"
+  default = {
+    listener_tags       = {},
+    target_group_tags   = {},
+    load_balancer_tags  = {},
+    security_group_tags = {},
+    tags                = {},
+  }
+}
+
+variable "logs_region" {
+  description = "AWS region for logs"
+  type        = string
 }

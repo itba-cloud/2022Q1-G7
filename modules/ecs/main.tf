@@ -1,38 +1,6 @@
 # ---------------------------------------------------------------------------
 # ECS resources
 # ---------------------------------------------------------------------------
-
-resource "aws_security_group" "service" {
-  name   = "${var.name}-sg-service"
-  vpc_id = var.vpc_id
-  ingress {
-    protocol         = "tcp"
-    from_port        = 80
-    to_port          = 80
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  egress {
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = merge(
-    {
-      "Name" = "${var.name}-sg-service"
-    },
-    var.tags,
-    var.security_group_tags
-  )
-
-}
-
-
-
 resource "aws_ecs_task_definition" "this" {
   count = length(var.services)
 
@@ -42,13 +10,24 @@ resource "aws_ecs_task_definition" "this" {
 
   family = "${var.services[count.index].name}-task"
   container_definitions = jsonencode([{
-    name  = "${var.services[count.index].name}-container"
-    image = "${aws_ecr_repository.this[count.index].repository_url}:latest"
+    name      = "${var.services[count.index].name}-container"
+    image     = "${aws_ecr_repository.this[count.index].repository_url}:latest"
     essential = true
+
     portMappings = [{
+      protocol      = "tcp"
       containerPort = var.services[count.index].containerPort
       hostPort      = 80
     }]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-group         = aws_cloudwatch_log_group.this.id,
+        awslogs-region        = var.logs_region
+        awslogs-stream-prefix = "ecs"
+      }
+    }
   }])
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -68,6 +47,12 @@ resource "aws_ecs_task_definition" "this" {
 
 resource "aws_ecs_cluster" "this" {
   name = "${var.name}-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
   tags = merge(
     {
       "Name" = "${var.name}-cluster"
@@ -77,25 +62,49 @@ resource "aws_ecs_cluster" "this" {
   )
 }
 
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "fargate"
+  retention_in_days = 1
+}
+
 resource "aws_ecs_cluster_capacity_providers" "this" {
   cluster_name       = aws_ecs_cluster.this.name
   capacity_providers = ["FARGATE"]
 }
 
-module "services_alb" {
+module "internal_alb" {
   source        = "../alb"
-  name          = "${var.name}-alb"
+  name          = "${var.name}-internal-alb"
   vpc_id        = var.vpc_id
+  vpc_cidr      = var.vpc_cidr
+  internal      = true
+  target_groups = [for service in var.services : "${service.name}"]
+
+  subnet_ids = var.private_subnet_ids
+
+  security_group_tags = var.private_alb_tags.security_group_tags
+  load_balancer_tags  = var.private_alb_tags.load_balancer_tags
+  target_group_tags   = var.private_alb_tags.target_group_tags
+  listener_tags       = var.private_alb_tags.listener_tags
+  tags                = var.private_alb_tags.tags
+}
+
+module "public_alb" {
+  source = "../alb"
+
+  name          = "${var.name}-public-alb"
+  vpc_id        = var.vpc_id
+  vpc_cidr      = var.vpc_cidr
   internal      = false
   target_groups = [for service in var.services : "${service.name}-service"]
 
-  subnet_ids = var.subnet_ids
+  subnet_ids = var.public_subnet_ids
 
-  security_group_tags = var.alb_tags.security_group_tags
-  load_balancer_tags  = var.alb_tags.load_balancer_tags
-  target_group_tags   = var.alb_tags.target_group_tags
-  listener_tags       = var.alb_tags.listener_tags
-  tags                = var.alb_tags.tags
+  security_group_tags = var.public_alb_tags.security_group_tags
+  load_balancer_tags  = var.public_alb_tags.load_balancer_tags
+  target_group_tags   = var.public_alb_tags.target_group_tags
+  listener_tags       = var.public_alb_tags.listener_tags
+  tags                = var.public_alb_tags.tags
 }
 
 resource "aws_ecs_service" "this" {
@@ -121,13 +130,19 @@ resource "aws_ecs_service" "this" {
   enable_ecs_managed_tags = true
 
   network_configuration {
-    security_groups  = [aws_security_group.service.id]
-    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.this.id]
+    subnets          = var.private_subnet_ids
     assign_public_ip = false
   }
 
   load_balancer {
-    target_group_arn = module.services_alb.target_groups[count.index].arn
+    target_group_arn = module.internal_alb.target_groups[count.index].arn
+    container_name   = "${var.services[count.index].name}-container"
+    container_port   = var.services[count.index].containerPort
+  }
+
+  load_balancer {
+    target_group_arn = module.public_alb.target_groups[count.index].arn
     container_name   = "${var.services[count.index].name}-container"
     container_port   = var.services[count.index].containerPort
   }

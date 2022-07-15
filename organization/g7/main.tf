@@ -35,19 +35,23 @@ module "ecs" {
   services = [
     {
       name          = "ecs-service-1"
-      image         = "chats:latest"
-      location      = "chats"
+      image         = "users:latest"
+      location      = "users"
       replicas      = 3
       containerPort = 80
     }
   ]
-  vpc_id     = module.vpc["vpc-1"].vpc_id
-  subnet_ids = values(module.vpc["vpc-1"].subnet_ids)
+  vpc_id             = module.vpc["vpc-1"].vpc_id
+  vpc_cidr           = module.vpc["vpc-1"].vpc_cidr
+  public_subnet_ids  = values(module.vpc["vpc-1"].public_subnet_ids)
+  private_subnet_ids = values(module.vpc["vpc-1"].private_subnet_ids)
 
   task_definition_tags = local.ecs.task_definition_tags
   cluster_tags         = local.ecs.cluster_tags
   security_group_tags  = local.ecs.security_group_tags
-  alb_tags             = local.ecs.alb.tags
+  public_alb_tags      = local.ecs.alb.tags
+  private_alb_tags     = local.ecs.alb.tags
+  logs_region          = local.region
 
 }
 

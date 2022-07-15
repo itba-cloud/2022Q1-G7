@@ -46,9 +46,25 @@ locals {
       network_acl = {
         ingress = {
           "rule-100" = {
-            from_port   = 1024,
+            from_port   = 80,
             protocol    = "tcp",
             rule_number = 100,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.3.0/24"
+          },
+          "rule-101" = {
+            from_port   = 80,
+            protocol    = "tcp",
+            rule_number = 101,
+            to_port     = 80,
+            rule_action = "allow",
+            cidr_block  = "10.0.4.0/24"
+          },
+          "rule-102" = {
+            from_port   = 1024,
+            protocol    = "tcp",
+            rule_number = 102,
             to_port     = 65535,
             rule_action = "allow",
             cidr_block  = "0.0.0.0/0"
