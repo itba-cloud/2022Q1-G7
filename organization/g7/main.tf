@@ -5,13 +5,15 @@ module "vpc" {
     aws = aws.aws
   }
 
-  source           = "../../modules/vpc"
-  cidr             = each.value.cidr
-  private_subnets  = each.value.private_subnets
-  public_subnets   = each.value.public_subnets
-  network_acl      = each.value.network_acl
-  network_acl_tags = each.value.network_acl.tags
-  vpc_tags         = each.value.tags
+  source               = "../../modules/vpc"
+  cidr                 = each.value.cidr
+  private_subnets      = each.value.private_subnets
+  public_subnets       = each.value.public_subnets
+  network_acl          = each.value.network_acl
+  network_acl_tags     = each.value.network_acl.tags
+  vpc_tags             = each.value.tags
+  enable_dns_hostnames = each.value.enable_dns_hostnames
+  enable_dns_support   = each.value.enable_dns_support
 
 }
 
@@ -36,6 +38,13 @@ module "ecs" {
       name          = "users"
       image         = "users:latest"
       location      = "users"
+      replicas      = 3
+      containerPort = 80
+    },
+    {
+      name          = "forums"
+      image         = "forums:latest"
+      location      = "forums"
       replicas      = 3
       containerPort = 80
     }

@@ -89,23 +89,31 @@ module "internal_alb" {
   tags                = var.private_alb_tags.tags
 }
 
-# module "public_alb" {
-#   source = "../alb"
+module "internal_alb_dns" {
 
-#   name          = "${var.name}-public-alb"
-#   vpc_id        = var.vpc_id
-#   vpc_cidr      = var.vpc_cidr
-#   internal      = false
-#   target_groups = [for service in var.services : "${service.name}-service"]
+  depends_on = [
+    module.internal_alb
+  ]
 
-#   subnet_ids = var.public_subnet_ids
+  source = "../route_53"
 
-#   security_group_tags = var.public_alb_tags.security_group_tags
-#   load_balancer_tags  = var.public_alb_tags.load_balancer_tags
-#   target_group_tags   = var.public_alb_tags.target_group_tags
-#   listener_tags       = var.public_alb_tags.listener_tags
-#   tags                = var.public_alb_tags.tags
-# }
+  vpc_id = var.vpc_id
+
+  hosted_zone_name = "internal.service"
+  records = [
+    {
+      name    = ""
+      type    = "A"
+      ttl     = 60
+      records = []
+      alias = {
+        name                   = module.internal_alb.dns_name,
+        zone_id                = module.internal_alb.zone_id,
+        evaluate_target_health = true
+      }
+    }
+  ]
+}
 
 resource "aws_ecs_service" "this" {
 
@@ -140,12 +148,6 @@ resource "aws_ecs_service" "this" {
     container_name   = "${var.services[count.index].name}-container"
     container_port   = var.services[count.index].containerPort
   }
-
-  # load_balancer {
-  #   target_group_arn = module.public_alb.target_groups[count.index].arn
-  #   container_name   = "${var.services[count.index].name}-container"
-  #   container_port   = var.services[count.index].containerPort
-  # }
 
   lifecycle {
     ignore_changes = [task_definition, desired_count]

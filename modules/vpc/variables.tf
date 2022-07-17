@@ -81,3 +81,15 @@ variable "igw_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_dns_hostnames" {
+  description = "Enable DNS hostnames for the VPC"
+  type        = bool
+  default     = false
+}
+
+variable "enable_dns_support" {
+  description = "Enable DNS support for the VPC"
+  type        = bool
+  default     = false
+}

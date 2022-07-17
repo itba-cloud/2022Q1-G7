@@ -76,7 +76,7 @@ resource "aws_alb_listener_rule" "this" {
 
 
   listener_arn = aws_alb_listener.http.arn
-  priority     = 100
+  priority     = 100 + count.index
 
   action {
     type             = "forward"
