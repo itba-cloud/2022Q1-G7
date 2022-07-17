@@ -3,10 +3,10 @@ locals {
   organization = "final-cloud-g7"
 
   cognito = {
-    name   = "${local.organization}-cognito"
-    domain = "${local.organization}-auth-domain"
+    name                  = "${local.organization}-cognito"
+    domain                = "${local.organization}-auth-domain"
     callback_url_endpoint = "/cognito/callback"
-    logout_url_endpoint = "/cognito/logout"
+    logout_url_endpoint   = "/cognito/logout"
   }
   vpcs = {
     "vpc-1" = {
@@ -48,62 +48,22 @@ locals {
       network_acl = {
         ingress = {
           "rule-100" = {
-            from_port   = 80,
-            protocol    = "tcp",
+            from_port   = 0,
+            protocol    = -1,
             rule_number = 100,
-            to_port     = 80,
-            rule_action = "allow",
-            cidr_block  = "10.0.3.0/24"
-          },
-          "rule-101" = {
-            from_port   = 80,
-            protocol    = "tcp",
-            rule_number = 101,
-            to_port     = 80,
-            rule_action = "allow",
-            cidr_block  = "10.0.4.0/24"
-          },
-          "rule-102" = {
-            from_port   = 1024,
-            protocol    = "tcp",
-            rule_number = 102,
-            to_port     = 65535,
+            to_port     = 0,
             rule_action = "allow",
             cidr_block  = "0.0.0.0/0"
           },
         },
         egress = {
           "rule-100" = {
-            from_port   = 80,
-            protocol    = "tcp",
+            from_port   = 0,
+            protocol    = -1,
             rule_number = 100,
-            to_port     = 80,
+            to_port     = 0,
             rule_action = "allow",
             cidr_block  = "0.0.0.0/0"
-          }
-          "rule-101" = {
-            from_port   = 443,
-            protocol    = "tcp",
-            rule_number = 101,
-            to_port     = 443,
-            rule_action = "allow",
-            cidr_block  = "0.0.0.0/0"
-          }
-          "rule-102" = {
-            from_port   = 1024,
-            protocol    = "tcp",
-            rule_number = 102,
-            to_port     = 65535,
-            rule_action = "allow",
-            cidr_block  = "10.0.3.0/24"
-          },
-          "rule-103" = {
-            from_port   = 1024,
-            protocol    = "tcp",
-            rule_number = 103,
-            to_port     = 65535,
-            rule_action = "allow",
-            cidr_block  = "10.0.4.0/24"
           }
         },
         tags = {
