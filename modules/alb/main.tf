@@ -16,7 +16,7 @@ resource "aws_lb" "this" {
 resource "aws_lb_target_group" "this" {
   count = length(var.target_groups)
 
-  name        = "${element(var.target_groups, count.index)}-${var.internal ? "private" : "public"}-tg"
+  name        = "${element(var.target_groups, count.index).name}-${var.internal ? "private" : "public"}-tg"
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
@@ -29,13 +29,13 @@ resource "aws_lb_target_group" "this" {
     protocol            = "HTTP"
     matcher             = "200"
     timeout             = "3"
-    path                = "/${element(var.target_groups, count.index)}"
+    path                = "/${element(var.target_groups, count.index).health_check_path}"
     unhealthy_threshold = "2"
   }
 
   tags = merge(
     {
-      "Name" = "${element(var.target_groups, count.index)}-${var.internal ? "private" : "public"}-tg"
+      "Name" = "${element(var.target_groups, count.index).name}-${var.internal ? "private" : "public"}-tg"
     },
     var.tags,
     var.target_group_tags
@@ -44,7 +44,6 @@ resource "aws_lb_target_group" "this" {
 
 resource "aws_alb_listener" "http" {
 
-  count = length(aws_lb_target_group.this.*)
 
   load_balancer_arn = aws_lb.this.arn
 
@@ -52,16 +51,42 @@ resource "aws_alb_listener" "http" {
   protocol = "HTTP"
 
   default_action {
-    target_group_arn = element(aws_lb_target_group.this.*, count.index).id
-    type             = "forward"
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "invalid path"
+      status_code  = "400"
+    }
   }
 
   tags = merge(
     {
-      "Name" = "${element(aws_lb_target_group.this.*, count.index).name}"
+      "Name" = "http-${var.internal ? "private" : "public"}-listener"
     },
     var.tags,
     var.listener_tags
   )
+
+}
+
+resource "aws_alb_listener_rule" "this" {
+
+  count = length(aws_lb_target_group.this.*)
+
+
+  listener_arn = aws_alb_listener.http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = element(aws_lb_target_group.this.*, count.index).arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/${element(var.target_groups, count.index).name}"]
+    }
+  }
 
 }

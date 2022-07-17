@@ -32,6 +32,7 @@ resource "docker_registry_image" "this" {
   count = length(var.services)
   name  = "${aws_ecr_repository.this[count.index].repository_url}:latest"
 
+  
   build {
     context = "../../resources/services/${element(var.services, count.index).location}"
   }

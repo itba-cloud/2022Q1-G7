@@ -14,8 +14,11 @@ variable "subnet_ids" {
 }
 
 variable "target_groups" {
-  type        = list(string)
-  description = "Names of the target groups of the resource"
+  type        = list(object({
+    name        = string,
+    health_check_path = string,
+  }))
+  description = "variables of the target groups of the resource"
 }
 
 variable "vpc_id" {

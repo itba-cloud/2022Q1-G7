@@ -270,24 +270,11 @@ locals {
 
 
 
-      ecs = {
-        cluster_tags = {
-
-        },
-        security_group_tags = {
-
-        },
-        task_definition_tags = {
-
-        },
-        tags = {
-
-
-        }
-    } }
+    }
   }
 
   ecs = {
+    health_check_path = "health-check"
     task_definition_tags = {
 
     },

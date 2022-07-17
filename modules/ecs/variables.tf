@@ -121,3 +121,9 @@ variable "logs_region" {
   description = "AWS region for logs"
   type        = string
 }
+
+
+variable "health_check_path" {
+  description = "Path to be used for health check"
+  type        = string
+}

@@ -6,7 +6,11 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/health-check")
+def health_check():
+    return {"status": "ok"}
+
+@app.get("/users")
 def read_root():
     return {
         "data": "User Service online"

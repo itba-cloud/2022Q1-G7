@@ -78,7 +78,7 @@ module "internal_alb" {
   vpc_id        = var.vpc_id
   vpc_cidr      = var.vpc_cidr
   internal      = true
-  target_groups = [for service in var.services : "${service.name}"]
+  target_groups = [for service in var.services : { name : service.name, health_check_path : var.health_check_path }]
 
   subnet_ids = var.private_subnet_ids
 
@@ -89,23 +89,23 @@ module "internal_alb" {
   tags                = var.private_alb_tags.tags
 }
 
-module "public_alb" {
-  source = "../alb"
+# module "public_alb" {
+#   source = "../alb"
 
-  name          = "${var.name}-public-alb"
-  vpc_id        = var.vpc_id
-  vpc_cidr      = var.vpc_cidr
-  internal      = false
-  target_groups = [for service in var.services : "${service.name}-service"]
+#   name          = "${var.name}-public-alb"
+#   vpc_id        = var.vpc_id
+#   vpc_cidr      = var.vpc_cidr
+#   internal      = false
+#   target_groups = [for service in var.services : "${service.name}-service"]
 
-  subnet_ids = var.public_subnet_ids
+#   subnet_ids = var.public_subnet_ids
 
-  security_group_tags = var.public_alb_tags.security_group_tags
-  load_balancer_tags  = var.public_alb_tags.load_balancer_tags
-  target_group_tags   = var.public_alb_tags.target_group_tags
-  listener_tags       = var.public_alb_tags.listener_tags
-  tags                = var.public_alb_tags.tags
-}
+#   security_group_tags = var.public_alb_tags.security_group_tags
+#   load_balancer_tags  = var.public_alb_tags.load_balancer_tags
+#   target_group_tags   = var.public_alb_tags.target_group_tags
+#   listener_tags       = var.public_alb_tags.listener_tags
+#   tags                = var.public_alb_tags.tags
+# }
 
 resource "aws_ecs_service" "this" {
 
@@ -141,11 +141,11 @@ resource "aws_ecs_service" "this" {
     container_port   = var.services[count.index].containerPort
   }
 
-  load_balancer {
-    target_group_arn = module.public_alb.target_groups[count.index].arn
-    container_name   = "${var.services[count.index].name}-container"
-    container_port   = var.services[count.index].containerPort
-  }
+  # load_balancer {
+  #   target_group_arn = module.public_alb.target_groups[count.index].arn
+  #   container_name   = "${var.services[count.index].name}-container"
+  #   container_port   = var.services[count.index].containerPort
+  # }
 
   lifecycle {
     ignore_changes = [task_definition, desired_count]
