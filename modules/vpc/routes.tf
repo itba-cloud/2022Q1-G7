@@ -16,17 +16,17 @@ resource "aws_route_table_association" "public" {
 
 
 resource "aws_route_table" "private" {
-  count = length(values(var.private_subnets))
+  count  = length(values(var.private_subnets))
   vpc_id = aws_vpc.this.id
 }
 resource "aws_route" "private" {
-  count = length(values(var.private_subnets))
-  route_table_id         = element(aws_route_table.private,count.index).id
+  count                  = length(values(var.private_subnets))
+  route_table_id         = element(aws_route_table.private, count.index).id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = element(aws_nat_gateway.main,count.index).id
+  nat_gateway_id         = element(aws_nat_gateway.main, count.index).id
 }
 resource "aws_route_table_association" "private" {
   count          = length(values(var.private_subnets))
   subnet_id      = element(values(aws_subnet.private), count.index).id
-  route_table_id = element(aws_route_table.private,count.index).id
+  route_table_id = element(aws_route_table.private, count.index).id
 }

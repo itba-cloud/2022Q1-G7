@@ -23,9 +23,14 @@ class User(BaseModel):
 
 app = FastAPI()
 
-dyanamodb = boto3.client('dynamodb')
+dyanamodb = boto3.client('dynamodb', region_name='us-east-1')
 
 prefix_router = APIRouter(prefix="/users")
+
+@prefix_router.get("/login")
+def login():
+    dyanamodb.get_item(TableName='users', Key={'id': {'S': '1'}})
+    return {"status": "oknt"}
 
 
 @app.get("/health-check")

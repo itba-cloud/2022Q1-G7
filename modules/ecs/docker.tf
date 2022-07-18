@@ -28,13 +28,13 @@ resource "aws_ecr_lifecycle_policy" "this" {
 
 #reference: https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs
 #reference: https://medium.com/devops-engineer-documentation/terraform-deploying-a-docker-image-to-an-aws-ecs-cluster-3931337e82fb
-resource "docker_registry_image" "this" {
-  count = length(var.services)
-  name  = "${aws_ecr_repository.this[count.index].repository_url}:latest"
+# resource "docker_registry_image" "this" {
+#   count = length(var.services)
+#   name  = "${aws_ecr_repository.this[count.index].repository_url}:latest"
 
 
-  build {
-    context  = "../../resources/services/${element(var.services, count.index).location}"
-    platform = "linux/amd64"
-  }
-}
+#   build {
+#     context  = "../../resources/services/${element(var.services, count.index).location}"
+#     platform = "linux/amd64"
+#   }
+# }

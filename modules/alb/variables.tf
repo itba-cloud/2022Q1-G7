@@ -14,8 +14,8 @@ variable "subnet_ids" {
 }
 
 variable "target_groups" {
-  type        = list(object({
-    name        = string,
+  type = list(object({
+    name              = string,
     health_check_path = string,
   }))
   description = "variables of the target groups of the resource"

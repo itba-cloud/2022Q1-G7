@@ -4,9 +4,9 @@
 resource "aws_ecs_task_definition" "this" {
   count = length(var.services)
 
-  depends_on = [
-    docker_registry_image.this
-  ]
+  # depends_on = [
+  #   docker_registry_image.this
+  # ]
 
   family = "${var.services[count.index].name}-task"
   container_definitions = jsonencode([{

@@ -42,12 +42,19 @@ module "ecs" {
       containerPort = 80
     },
     {
-      name          = "forums"
-      image         = "forums:latest"
-      location      = "forums"
+      name          = "courses"
+      image         = "courses:latest"
+      location      = "courses"
       replicas      = 3
       containerPort = 80
-    }
+    },
+    # {
+    #   name          = "forums"
+    #   image         = "forums:latest"
+    #   location      = "forums"
+    #   replicas      = 3
+    #   containerPort = 80
+    # }
   ]
   vpc_id             = module.vpc["vpc-1"].vpc_id
   vpc_cidr           = module.vpc["vpc-1"].vpc_cidr

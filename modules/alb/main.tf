@@ -85,7 +85,7 @@ resource "aws_alb_listener_rule" "this" {
 
   condition {
     path_pattern {
-      values = ["/${element(var.target_groups, count.index).name}"]
+      values = ["/${element(var.target_groups, count.index).name}", "/${element(var.target_groups, count.index).name}/*"]
     }
   }
 

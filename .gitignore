@@ -32,3 +32,5 @@ override.tf.json
 organization/example_*
 
 *.hcl
+
+*__pycache__*

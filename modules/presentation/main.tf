@@ -65,8 +65,8 @@ resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
 
   redirect_all_requests_to {
-    host_name = "${var.website_name}"
-    protocol = "https"
+    host_name = var.website_name
+    protocol  = "https"
   }
 }
 
