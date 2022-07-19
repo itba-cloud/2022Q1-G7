@@ -207,31 +207,19 @@ locals {
       key = "id"
       attributes = [
         { name = "id", type = "S" },
-        { name = "name", type = "S" },
       ]
       read_capacity  = 1
       write_capacity = 1
     }
     "courses" = {
-      key = "id"
+      key       = "PK"
+      range_key = "SK"
       attributes = [
-        { name = "id", type = "S" },
-        { name = "name", type = "S" },
+        { name = "PK", type = "S" },
+        { name = "SK", type = "S" },
       ]
       read_capacity  = 1
       write_capacity = 1
-    }
-    "recordings" = {
-      key = "id"
-      attributes = [
-        { name = "id", type = "S" },
-        { name = "name", type = "S" },
-      ]
-      read_capacity  = 1
-      write_capacity = 1
-
-
-
     }
   }
 
