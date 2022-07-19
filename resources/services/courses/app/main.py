@@ -65,7 +65,7 @@ def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "stude
     role = f":{role}" if role else ""
     key = f"user:{user_id}" + role
     items = courses.query(KeyConditionExpression=Key('PK').eq(key))
-    return [Course(id=item['SK'], name=item['name'], description=item['description'], image=item['image'], rating=item['rating'], owner=item['owner']) for item in items['Items']]
+    return [Course(id=item['SK'].split(":")[1], name=item['name'], description=item['description'], image=item['image'], rating=item['rating'], owner=item['owner']) for item in items['Items']]
 
 
 @ prefix_router.get("/{course_id}", response_model=CourseOverview)
@@ -77,7 +77,7 @@ async def get_course(course_id: str):
         raise HTTPException(status_code=404, detail="Course not found")
     item = item['Items'][0]
     course_overview = CourseOverview(
-        data=Course(id=item['SK'], name=item['name'], description=item['description'],
+        data=Course(id=item['SK'].split(":")[1], name=item['name'], description=item['description'],
                     image=item['image'], rating=item['rating'], owner=item['owner']),
         owner=item['owner_info'],
         numberOfStudents=item['students'],
