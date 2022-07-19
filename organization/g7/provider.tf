@@ -24,6 +24,6 @@ provider "docker" {
   }
 }
 
-provider tls{
-  
+provider "tls" {
+
 }
