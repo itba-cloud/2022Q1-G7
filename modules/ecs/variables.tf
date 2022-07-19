@@ -127,3 +127,23 @@ variable "health_check_path" {
   description = "Path to be used for health check"
   type        = string
 }
+
+variable "client_id" {
+  description = "value of the client id"
+  type        = string
+}
+
+variable "client_secret" {
+  description = "value of the client secret"
+  type        = string
+}
+
+variable "auth_domain" {
+  description = "value of the auth domain"
+  type        = string
+}
+
+variable "redirect_uri" {
+  description = "value of the redirect uri"
+  type        = string
+}

@@ -1,6 +1,13 @@
 # ---------------------------------------------------------------------------
 # ECS resources
 # ---------------------------------------------------------------------------
+
+# Generate a new SSH key
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
 resource "aws_ecs_task_definition" "this" {
   count = length(var.services)
 
@@ -13,6 +20,15 @@ resource "aws_ecs_task_definition" "this" {
     name      = "${var.services[count.index].name}-container"
     image     = "${aws_ecr_repository.this[count.index].repository_url}:latest"
     essential = true
+
+    environment = [
+      { "name" : "CLIENT_ID", "value" : var.client_id },
+      { "name" : "CLIENT_SECRET", "value" : var.client_secret },
+      { "name" : "AUTH_DOMAIN", "value" : var.auth_domain },
+      { "name" : "REDIRECT_URI", "value" : var.redirect_uri },
+      { "name" : "PRIVATE_KEY", "value" : tls_private_key.ssh.private_key_openssh },
+      { "name" : "PUBLIC_KEY", "value" : tls_private_key.ssh.public_key_openssh }
+    ]
 
     portMappings = [{
       protocol      = "tcp"
@@ -150,7 +166,7 @@ resource "aws_ecs_service" "this" {
   }
 
   lifecycle {
-    ignore_changes = [task_definition, desired_count]
+    ignore_changes = [desired_count]
   }
 }
 

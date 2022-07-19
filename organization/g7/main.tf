@@ -21,6 +21,7 @@ module "ecs" {
 
   depends_on = [
     module.vpc
+
   ]
 
   providers = {
@@ -33,6 +34,14 @@ module "ecs" {
   container_memory   = "512"
   task_role_arn      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   execution_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+
+  client_id     = aws_cognito_user_pool_client.userpool_client.id
+  client_secret = aws_cognito_user_pool_client.userpool_client.client_secret
+  auth_domain   = "https://${local.organization}-auth-domain.auth.${data.aws_region.current.name}.amazoncognito.com"
+  redirect_uri  = "https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"
+
+
+
   services = [
     {
       name          = "users"
@@ -70,20 +79,20 @@ module "ecs" {
   health_check_path    = local.ecs.health_check_path
 }
 
-# module "presentation" {
-#   source = "../../modules/presentation"
+module "presentation" {
+  source = "../../modules/presentation"
 
-#   providers = {
-#     aws = aws.aws
-#   }
+  providers = {
+    aws = aws.aws
+  }
 
-#   website_name = local.website.name
-#   objects      = local.website.objects
+  website_name = local.website.name
+  objects      = local.website.objects
 
-#   www_bucket_tags = local.website.www_tags
-#   bucket_tags     = local.website.official_tags
-#   bucket_log_tags = local.website.log_tags
-# }
+  www_bucket_tags = local.website.www_tags
+  bucket_tags     = local.website.official_tags
+  bucket_log_tags = local.website.log_tags
+}
 
 
 # module "chat" {

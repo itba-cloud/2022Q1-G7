@@ -10,5 +10,10 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "2.16.0"
     }
+
+    tls = {
+      source  = "hashicorp/tls"
+      version = "3.4.0"
+    }
   }
 }
