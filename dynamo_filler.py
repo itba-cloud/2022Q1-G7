@@ -10,7 +10,7 @@ courses = [{
     "description":
     'This course is designed to give students a basic understanding of the fundamental concepts of computer science.',
     "owner": 'Dr. John Smith',
-    "image":'https://"image"s.unsplash.com/photo-1452457750107-cd084dce177d?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    "image":'https://images.unsplash.com/photo-1452457750107-cd084dce177d?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
     "rating": 4.3,
 },
     {
@@ -19,7 +19,7 @@ courses = [{
     "description":
     'This course is designed to give students a basic understanding of the fundamental concepts of machine learning.',
     "owner": 'Dr. John Smith',
-    "image":'https://"image"s.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    "image":'https://images.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
     "rating": 4.3,
 },
     {
@@ -28,7 +28,7 @@ courses = [{
     "description":
     'This course is designed to give students a basic understanding of the fundamental concepts of machine learning.',
     "owner": 'Dr. John Smith',
-    "image":'https://"image"s.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    "image":'https://images.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
     "rating": 4.3,
 },
     {
@@ -37,7 +37,7 @@ courses = [{
     "description":
     'This course is designed to give students a basic understanding of the fundamental concepts of machine learning.',
     "owner": 'Dr. John Smith',
-    "image":'https://"image"s.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    "image":'https://images.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
     "rating": 4.3,
 },
     {
@@ -46,7 +46,7 @@ courses = [{
     "description":
     'This course is designed to give students a basic understanding of the fundamental concepts of machine learning.',
     "owner": 'Dr. John Smith',
-    "image":'https://"image"s.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    "image":'https://images.unsplash.com/photo-1445620466293-d6316372ab59?ixlib=rb-1.2.1&ix"id"=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y29tcHV0ZXIlMjBzY2llbmR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
     "rating": 4.3,
 }, ]
 
