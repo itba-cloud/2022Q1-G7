@@ -65,7 +65,14 @@ def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "stude
     role = f":{role}" if role else ""
     key = f"user:{user_id}" + role
     items = courses.query(KeyConditionExpression=Key('PK').eq(key))
-    return [Course(id=item['SK'].split(":")[1], name=item['name'], description=item['description'], image=item['image'], rating=item['rating'], owner=item['owner']) for item in items['Items']]
+    return [Course(
+        id=item['SK'].split(":")[1],
+        name=item['name'],
+        description=item['description'],
+        image=item['image'],
+        rating=item['rating'],
+        owner=item['owner'])
+        for item in items['Items']]
 
 
 @ prefix_router.get("/{course_id}", response_model=CourseOverview)
@@ -87,7 +94,34 @@ async def get_course(course_id: str):
     return course_overview
 
 
-@ prefix_router.post("/", status_code=204)
+@prefix_router.post("/subscriptions", status_code=204)
+async def subscribe_to_course(course_id: str, user_id: str):
+    item = courses.query(
+        KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
+    )
+    if len(item['Items']) == 0:
+        raise HTTPException(status_code=404, detail="Course not found")
+    item = item['Items'][0]
+    courses.put_item(
+        Item={
+            'PK': f"user:{user_id}:student",
+            'SK': f"course:{course_id}",
+            'name': item['name'],
+            'description': item['description'],
+            'image': item['image'],
+            'rating': item['rating'],
+            'owner': item['owner'],
+        }
+    )
+
+    item['students'] += 1
+    courses.update_item(
+        Item=item)
+
+    return None
+
+
+@ prefix_router.post("/", status_code=201)
 async def create_course(user_id: str, course: InputCourse):
     course_id = uuid4()
     owner = {
