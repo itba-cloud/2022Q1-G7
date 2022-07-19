@@ -1,6 +1,7 @@
 # reference: https://fastapi.tiangolo.com/deployment/docker/
 import base64
 import enum
+from turtle import update
 from urllib import response
 import httpx
 import jwt
@@ -27,8 +28,6 @@ class User(BaseModel):
 
 app = FastAPI()
 
-dyanamodb = boto3.resource('dynamodb', region_name='us-east-1')
-users = dyanamodb.Table('users')
 
 prefix_router = APIRouter(prefix="/users")
 
@@ -39,12 +38,40 @@ client_secret = os.getenv(
 AUTH_DOMAIN = os.getenv(
     "AUTH_DOMAIN", "https://final-cloud-g7-auth-domain.auth.us-east-1.amazoncognito.com")
 redirect_uri = os.getenv(
-    "REDIRECT_URI", "https://www.final-cloud-g7-web.aleph51.com.ar.s3-website-us-east-1.amazonaws.com/cognito/callback")
+    "REDIRECT_URI", "http://localhost:3000/cognito/callback")
 
-PRIVATE_KEY = os.getenv("PRIVATE_KEY","private_key")
+PRIVATE_KEY = os.getenv("PRIVATE_KEY", "private_key")
 PUBLIC_KEY = os.getenv("PUBLIC_KEY",)
 
 cognito_endpoint = f"{AUTH_DOMAIN}/oauth2/token"
+
+dyanamodb = boto3.resource('dynamodb', region_name='us-east-1')
+users = dyanamodb.Table('users')
+
+def create_user(user, oauth):
+
+
+    item = {
+        'id': user.json()['sub'],
+        'email': user.json()['email'],
+        'username': user.json()['username'],
+        "id_token": oauth.json()['id_token'],
+        "access_token": oauth.json()['access_token'],
+        "refresh_token": oauth.json()['refresh_token'],
+        "expires_in": oauth.json()['expires_in'],
+        "avatar_url": ""
+
+    }
+    users.put_item(Item=item)
+    return item
+
+def update_user_auth(user, oauth):
+    users.update_item(Key={'id': user.json()['sub']}, AttributeUpdates = {
+        'id_token': {'Value': oauth.json()['id_token']},
+        'access_token': {'Value': oauth.json()['access_token']},
+        'refresh_token': {'Value': oauth.json()['refresh_token']},
+        'expires_in': {'Value': oauth.json()['expires_in']},
+    })
 
 
 @prefix_router.get("/login")
@@ -83,34 +110,44 @@ def login(code: str, response: Response):
         print(e)
         response.status_code = status.HTTP_418_IM_A_TEAPOT
         return user.json()
-    
+
     if user.status_code != 200:
         response.status_code = status.HTTP_418_IM_A_TEAPOT
         return user.json()
-    
 
-    item = {
-        'id': user.json()['sub'],
-        'email': user.json()['email'],
-        'username': user.json()['username'],
-        "id_token": oauth.json()['id_token'],
-        "access_token": oauth.json()['access_token'],
-        "refresh_token": oauth.json()['refresh_token'],
-        "expires_in": oauth.json()['expires_in'],
+    try:
+        # get to dynamo
+        user_db = users.get_item(Key={'id': user.json()['sub']})
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_418_IM_A_TEAPOT
+        return {"error": "request to dynamo failed"}
 
-    }
+    if not "Item" in user_db:
+        user_db = create_user(user, oauth)
+
+    else:
+        update_user_auth(user, oauth)
+        user_db = user_db['Item']
 
     jwt_payload = {
         "role": "student",
         "id": user.json()['sub'],
     }
 
-    users.put_item(Item=item)
-
     jwt_token = jwt.encode(jwt_payload, PRIVATE_KEY, algorithm="HS256")
 
+    print(user_db)
+
     payload = {
-        "jwt": jwt_token,
+        "user": {
+            "id": user_db['id'],
+            "email": user_db['email'],
+            "name": user_db['username'],
+            "role": "student",
+            "avatarUrl": user_db["avatar_url"]
+        },
+        "token": jwt_token,
     }
     return payload
 

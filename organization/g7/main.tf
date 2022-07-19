@@ -38,8 +38,8 @@ module "ecs" {
   client_id     = aws_cognito_user_pool_client.userpool_client.id
   client_secret = aws_cognito_user_pool_client.userpool_client.client_secret
   auth_domain   = "https://${local.organization}-auth-domain.auth.${data.aws_region.current.name}.amazoncognito.com"
-  redirect_uri  = "https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"
-
+  #redirect_uri  = "https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"
+  redirect_uri = "http://localhost:3000${local.cognito.callback_url_endpoint}"
 
 
   services = [
