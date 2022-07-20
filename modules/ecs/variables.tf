@@ -147,3 +147,8 @@ variable "redirect_uri" {
   description = "value of the redirect uri"
   type        = string
 }
+
+variable "private_key" {
+  description = "value of the private key"
+  type        = string
+}

@@ -1,13 +1,19 @@
 # --------------------------------------------------------------------
 # ECS output
 # --------------------------------------------------------------------
+output "security_group_id" {
+  value = aws_security_group.this.id
+}
 
-# output "task_definition_arn" {
-#   description = "Task definition ARN"
-#   value       = aws_ecs_task_definition.this.arn
-# }
+output "alb_id" {
+  value = module.internal_alb.alb_id
+}
 
-# output "cluster_arn" {
-#   description = "Cluster ARN"
-#   value       = aws_ecs_cluster.this.arn
-# }
+output "alb_arn" {
+  value = module.internal_alb.arn
+}
+
+output "alb_listener_arn" {
+  value = module.internal_alb.listener_arn
+}
+

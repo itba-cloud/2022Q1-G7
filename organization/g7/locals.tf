@@ -1,6 +1,6 @@
 locals {
   region       = "us-east-1"
-  organization = "final-cloud-g7"
+  organization = "final-cc-test"
 
   cognito = {
     name                  = "${local.organization}-cognito"
@@ -112,95 +112,20 @@ locals {
     }
   }
 
-  # apigateway = {
-  #   name = "${local.organization}-apigateway"
-
-  #   resources = {
-  #     "courses" = {
-  #       "GET" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["getCourses"].invoke_arn
-  #       },
-  #       "POST" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["createCourses"].invoke_arn
-  #       },
-  #     },
-  #     "profiles" = {
-  #       "GET" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["getProfiles"].invoke_arn
-  #       },
-  #       "POST" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["createProfiles"].invoke_arn
-  #       },
-  #     },
-  #     "threads" = {
-  #       "GET" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["getThreads"].invoke_arn
-  #       },
-  #       "POST" = {
-  #         type = "AWS_PROXY"
-  #         uri  = aws_lambda_function.this["createThreads"].invoke_arn
-  #       },
-  #     },
-  #   }
-
-  #   logging_levels = ["INFO", "ERROR"]
-  # }
-
-  # lambdas = {
-  #   "getCourses" = {
-  #     path      = "lambda/lambda_get_courses.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_get_courses"
-  #     resource  = "courses"
-  #     method    = "GET"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   },
-  #   "createCourses" = {
-  #     path      = "lambda/lambda_post_courses.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_post_courses"
-  #     resource  = "courses"
-  #     method    = "POST"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   },
-  #   "getProfiles" = {
-  #     path      = "lambda/lambda_get_profiles.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_get_profiles"
-  #     resource  = "profiles"
-  #     method    = "GET"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   },
-  #   "createProfiles" = {
-  #     path      = "lambda/lambda_post_profiles.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_post_profiles"
-  #     resource  = "profiles"
-  #     method    = "POST"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   },
-  #   "getThreads" = {
-  #     path      = "lambda/lambda_get_threads.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_get_threads"
-  #     resource  = "threads"
-  #     method    = "GET"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   },
-  #   "createThreads" = {
-  #     path      = "lambda/lambda_post_threads.py.zip"
-  #     principal = "apigateway"
-  #     handler   = "lambda_post_threads"
-  #     resource  = "threads"
-  #     method    = "POST"
-  #     #source_arn = aws_api_gateway_stage.this.execution_arn
-  #   }
-  # }
+  lambdas = {
+    "auth" = {
+      path      = "lambda/auth_handler.zip"
+      principal = "apigateway"
+      handler   = "auth_handler"
+      resource  = "auth"
+      method    = "ANY"
+      env = {
+        PRIVATE_KEY = tls_private_key.ssh.private_key_openssh
+      }
+      #source_arn = aws_api_gateway_stage.this.execution_arn
+    },
+  }
+  authorizer_name = "${local.organization}-api-auth"
 
   dynambodb = {
     "users" = {

@@ -40,7 +40,6 @@ redirect_uri = os.getenv(
     "REDIRECT_URI", "http://localhost:3000/cognito/callback")
 
 PRIVATE_KEY = os.getenv("PRIVATE_KEY", "private_key")
-PUBLIC_KEY = os.getenv("PUBLIC_KEY",)
 
 cognito_endpoint = f"{AUTH_DOMAIN}/oauth2/token"
 
@@ -155,6 +154,7 @@ def login(code: str, response: Response):
 
 class UserUpdate(BaseModel):
     role: Role
+
 
 @prefix_router.put("/{id}/role")
 def update_role(id: str, user_update: UserUpdate):

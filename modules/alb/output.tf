@@ -2,6 +2,9 @@ output "target_groups" {
   value = aws_lb_target_group.this
 }
 
+output "alb_id" {
+  value = aws_lb.this.id
+}
 output "arn" {
   value = aws_lb.this.arn
 }

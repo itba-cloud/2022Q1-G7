@@ -17,6 +17,12 @@ module "vpc" {
 
 }
 
+# Generate a new SSH key
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
 module "ecs" {
 
   depends_on = [
@@ -40,7 +46,7 @@ module "ecs" {
   auth_domain   = "https://${local.organization}-auth-domain.auth.${data.aws_region.current.name}.amazoncognito.com"
   #redirect_uri  = "https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"
   redirect_uri = "http://localhost:3000${local.cognito.callback_url_endpoint}"
-
+  private_key  = tls_private_key.ssh.private_key_openssh
 
   services = [
     {
@@ -57,13 +63,6 @@ module "ecs" {
       replicas      = 3
       containerPort = 80
     },
-    # {
-    #   name          = "forums"
-    #   image         = "forums:latest"
-    #   location      = "forums"
-    #   replicas      = 3
-    #   containerPort = 80
-    # }
   ]
   vpc_id             = module.vpc["vpc-1"].vpc_id
   vpc_cidr           = module.vpc["vpc-1"].vpc_cidr
