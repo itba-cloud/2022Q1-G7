@@ -73,7 +73,7 @@ def health_check():
 
 
 @prefix_router.get("", response_model=List[Course])
-def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "student"):
+def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "STUDENT"):
     if user_id == "#":
         role = None
     role = f":{role}" if role else ""
@@ -92,8 +92,8 @@ def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "stude
 def is_subscribed(user_id: str, course_id: str):
     sub = courses.query(
 
-        KeyConditionExpression=((Key('PK').eq(f"user:{user_id}:student")
-                                or Key('PK').eq(f"user:{user_id}:teacher"))
+        KeyConditionExpression=((Key('PK').eq(f"user:{user_id}:STUDENT")
+                                or Key('PK').eq(f"user:{user_id}:TEACHER"))
                                 & Key('SK').eq(f"course:{course_id}"))
     )
     return len(sub['Items']) > 0
@@ -135,7 +135,7 @@ async def subscribe_to_course(course_id: str, user_id: str):
 
     courses.put_item(
         Item={
-            'PK': f"user:{user_id}:student",
+            'PK': f"user:{user_id}:STUDENT",
             'SK': f"course:{course_id}",
             'name': item['name'],
             'description': item['description'],
@@ -177,7 +177,7 @@ async def create_course(user_id:str = Form(...), image: UploadFile = File(...), 
     }
 
     item_user = {
-        'PK': f"user:{user_id}:student",
+        'PK': f"user:{user_id}:TEACHER",
         'SK': f"course:{course_id}",
         'name': name,
         'description':description,
