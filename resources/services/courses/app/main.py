@@ -2,7 +2,8 @@
 
 import datetime
 from uuid import uuid4
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, File, HTTPException, Form, Response, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
@@ -10,6 +11,14 @@ from boto3.dynamodb.conditions import Key, Attr
 from typing import List, Union, Any
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 prefix_router = APIRouter(prefix="/courses")
 
@@ -49,9 +58,8 @@ class InputCourse(BaseModel):
 
 
 class InputCourseFile(BaseModel):
-    id: str
     content: Union[InputImage, None] = None
-    file: bytes
+    file : str= Form(...)
 
 
 @app.get("/health-check")
@@ -87,15 +95,15 @@ def is_subscribed(user_id: str, course_id: str):
 
 
 @ prefix_router.get("/{course_id}", response_model=CourseOverview)
-async def get_course(course_id: str, user_id: Union[str, None]="#"):
-    item=courses.query(
+async def get_course(course_id: str, user_id: Union[str, None] = "#"):
+    item = courses.query(
         KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
     )
     if len(item['Items']) == 0:
         raise HTTPException(status_code=404, detail="Course not found")
-    item=item['Items'][0]
+    item = item['Items'][0]
 
-    course_overview=CourseOverview(
+    course_overview = CourseOverview(
         data=Course(id=item['SK'].split(":")[1], name=item['name'], description=item['description'],
                     image=item['image'], rating=item['rating'], owner=item['owner']),
         owner=item['owner_info'],
@@ -109,13 +117,13 @@ async def get_course(course_id: str, user_id: Union[str, None]="#"):
 
 @ prefix_router.post("/subscriptions", status_code=201)
 async def subscribe_to_course(course_id: str, user_id: str):
-    item=courses.query(
+    item = courses.query(
         KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
     )
 
     if len(item['Items']) == 0:
         raise HTTPException(status_code=404, detail="Course not found")
-    item=item['Items'][0]
+    item = item['Items'][0]
 
     if is_subscribed(user_id, course_id):
         raise HTTPException(status_code=409, detail="Already subscribed")
@@ -139,8 +147,8 @@ async def subscribe_to_course(course_id: str, user_id: str):
 
 @ prefix_router.post("", status_code=201)
 async def create_course(user_id: str, course: InputCourse):
-    course_id=uuid4()
-    owner={
+    course_id = uuid4()
+    owner = {
         "id": user_id,
         "role": "teacher",
         "name": "Jhon Doe",
@@ -148,7 +156,7 @@ async def create_course(user_id: str, course: InputCourse):
         "email": "jhondoe@mail.com",
     }
 
-    item_user={
+    item_user = {
         'PK': f"user:{user_id}:student",
         'SK': f"course:{course_id}",
         'name': course.name,
@@ -162,7 +170,7 @@ async def create_course(user_id: str, course: InputCourse):
         Item=item_user
     )
 
-    item={
+    item = {
         'PK': f"course:{course_id}",
         'SK': f"course:{course_id}",
         'name': course.name,
@@ -180,15 +188,78 @@ async def create_course(user_id: str, course: InputCourse):
         Item=item
     )
 
-    item['PK']=f"user:#"
+    item['PK'] = f"user:#"
     courses.put_item(
         Item=item
     )
     return
 
 
-@ prefix_router.post("/courses/{course_id}/files", status_code=204)
-async def create_course_file(course_id: str, file: InputCourseFile):
-    raise HTTPException(status_code=501, detail="Not implemented")
+s3_resource = boto3.resource('s3', region_name='us-east-1')
+images = s3_resource.Bucket('final-cloud-g7-images')
+content = s3_resource.Bucket('final-cloud-g7-content')
+s3 = boto3.client('s3', region_name='us-east-1')
+
+
+@prefix_router.get("/{course_id}/content")
+async def get_course_content(course_id: str, user_id: Union[str, None] = "#"):
+    # search content in bucket folder course_id
+    try:
+        files = s3.list_objects_v2(Bucket=content.name, Prefix=course_id)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail={
+                            "ex": str(e), "files": files})
+    try:
+        ret = [{
+            "contentId": item["Key"].split("/")[-1],
+            "content": {
+                "name": item["Key"].split("/")[-1],
+                "size": item["Size"],
+            },
+            "uploaded": item["LastModified"],
+            "downloadUrl": ""
+        } for item in files['Contents']]
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail={
+                            "ex": str(e), "files": files})
+    return ret
+
+
+@prefix_router.get("/{course_id}/content/{file_id}")
+async def get_course_content_file(course_id: str, file_id: str):
+    # search content in bucket folder course_id
+    try:
+        file = s3.get_object(Bucket=content.name, Key=f"{course_id}/{file_id}")
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail={
+                            "ex": str(e)})
+    return Response(file['Body'].read(), media_type="application/octet-stream")
+
+
+
+@prefix_router.post("/{course_id}/content", status_code=204)
+#async def create_course_file(course_id: str , file: bytes = File(...)):
+async def create_course_file(course_id: str , file: UploadFile = File(...)):
+    # search content in bucket folder course_id
+    try:
+        s3.put_object(Bucket=content.name,
+                      Key=f"{course_id}/{file.filename}", Body=file.file)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail={"ex": str(e)})
+    return
+
+@prefix_router.delete("/{course_id}/content/{file_id}", status_code=204)
+async def delete_course_content_file(course_id: str, file_id: str):
+    # search content in bucket folder course_id
+    try:
+        s3.delete_object(Bucket=content.name, Key=f"{course_id}/{file_id}")
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail={"ex": str(e)})
+    return
 
 app.include_router(prefix_router)

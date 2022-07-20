@@ -1,8 +1,0 @@
-#reference: https://fastapi.tiangolo.com/deployment/docker/
-fastapi>=0.68.0,<0.69.0
-pydantic>=1.8.0,<2.0.0
-uvicorn>=0.15.0,<0.16.0
-boto3>1.24.30,<=1.24.31
-httpx>0.22.0,<=0.23.0
-PyJWT==1.7.1
-cryptography==37.0.4

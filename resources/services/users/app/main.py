@@ -7,6 +7,7 @@ from typing import Union
 import os
 
 from fastapi import APIRouter, Body, FastAPI, HTTPException, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 
 import boto3
 from pydantic import BaseModel
@@ -27,13 +28,24 @@ class User(BaseModel):
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
 
 prefix_router = APIRouter(prefix="/users")
 
 
-client_id = os.getenv("CLIENT_ID", "bast2atl9hm3lopc88ie04k1")
+
+
+client_id = os.getenv("CLIENT_ID", "71dpujgvbmaa1ptj2q7ng3ev5l")
 client_secret = os.getenv(
-    "CLIENT_SECRET", "u42sa6p705lctec8cr44veduo0aipf19ljmigi0b6u5n1b956n")
+    "CLIENT_SECRET", "dj0gar9aphi9mp84jvf6eh1sll0dpea2iq0e64okaa1e1pt52co")
 AUTH_DOMAIN = os.getenv(
     "AUTH_DOMAIN", "https://final-cloud-g7-auth-domain.auth.us-east-1.amazoncognito.com")
 redirect_uri = os.getenv(
@@ -76,7 +88,7 @@ def update_user_auth(user, oauth):
 
 @prefix_router.get("/login")
 def login(code: str):
-
+    print("LOGIN")
     msg_bytes = f"{client_id}:{client_secret}".encode('utf-8')
     msg_b64 = base64.b64encode(msg_bytes).decode('utf-8')
 
