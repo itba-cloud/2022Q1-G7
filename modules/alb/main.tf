@@ -1,15 +1,15 @@
 resource "aws_lb" "this" {
   name               = var.name
   internal           = var.internal
-  load_balancer_type = "application"
+  load_balancer_type = var.load_balancer_type
   security_groups    = [aws_security_group.this.id]
   subnets            = var.subnet_ids
   tags = merge(
     {
       "Name" = var.name
     },
-    var.tags,
-    var.load_balancer_tags
+    var.tags.common,
+    var.tags.load_balancer_tags
   )
 }
 
@@ -37,8 +37,8 @@ resource "aws_lb_target_group" "this" {
     {
       "Name" = "${element(var.target_groups, count.index).name}-${var.internal ? "private" : "public"}-tg"
     },
-    var.tags,
-    var.target_group_tags
+    var.tags.common,
+    var.tags.target_group_tags
   )
 }
 
@@ -62,10 +62,10 @@ resource "aws_alb_listener" "http" {
 
   tags = merge(
     {
-      "Name" = "http-${var.internal ? "private" : "public"}-listener"
+      "Name" = format("http-%s-listener", var.internal ? "private" : "public")
     },
-    var.tags,
-    var.listener_tags
+    var.tags.common,
+    var.tags.listener_tags
   )
 
 }

@@ -19,7 +19,7 @@ module "vpc" {
 
 # Generate a new SSH key
 resource "tls_private_key" "ssh" {
-  provider = tls
+  provider  = tls
   algorithm = "RSA"
   rsa_bits  = "4096"
 }
@@ -49,22 +49,7 @@ module "ecs" {
   redirect_uri = "http://localhost:3000${local.cognito.callback_url_endpoint}"
   private_key  = tls_private_key.ssh.private_key_openssh
 
-  services = [
-    {
-      name          = "users"
-      image         = "users:latest"
-      location      = "users"
-      replicas      = 3
-      containerPort = 80
-    },
-    {
-      name          = "courses"
-      image         = "courses:latest"
-      location      = "courses"
-      replicas      = 3
-      containerPort = 80
-    },
-  ]
+  services           = local.services
   vpc_id             = module.vpc["vpc-1"].vpc_id
   vpc_cidr           = module.vpc["vpc-1"].vpc_cidr
   public_subnet_ids  = values(module.vpc["vpc-1"].public_subnet_ids)
@@ -73,7 +58,6 @@ module "ecs" {
   task_definition_tags = local.ecs.task_definition_tags
   cluster_tags         = local.ecs.cluster_tags
   security_group_tags  = local.ecs.security_group_tags
-  public_alb_tags      = local.ecs.alb.tags
   private_alb_tags     = local.ecs.alb.tags
   logs_region          = local.region
   health_check_path    = local.ecs.health_check_path

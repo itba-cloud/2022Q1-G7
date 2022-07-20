@@ -112,6 +112,23 @@ locals {
     }
   }
 
+  services = {
+    users-service = {
+      name          = "users"
+      image         = "users:latest"
+      location      = "users"
+      replicas      = 3
+      containerPort = 80
+    },
+    courses-service = {
+      name          = "courses"
+      image         = "courses:latest"
+      location      = "courses"
+      replicas      = 3
+      containerPort = 80
+    },
+  }
+
   lambdas = {
     "auth" = {
       path      = "lambda/auth_handler.zip"

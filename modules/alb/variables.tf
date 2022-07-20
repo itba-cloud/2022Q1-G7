@@ -31,33 +31,15 @@ variable "vpc_cidr" {
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Tags to be applied to the service"
-  default     = {}
-}
-
-variable "security_group_tags" {
-  type        = map(string)
-  description = "Tags to be applied to the security group"
-  default     = {}
-}
-
-variable "load_balancer_tags" {
-  type        = map(string)
-  description = "Tags to be applied to the load balancer"
-  default     = {}
-}
-
-variable "target_group_tags" {
-  type        = map(string)
-  description = "Tags to be applied to the load balancer security groups"
-  default     = {}
-}
-
-variable "listener_tags" {
-  type        = map(string)
-  description = "Tags to be applied to the load balancer listener"
-  default     = {}
+  default = {
+    security_group_tags = {}
+    load_balancer_tags  = {}
+    target_group_tags   = {}
+    listener_tags       = {}
+    common              = {}
+  }
 }
 
 variable "sg_ingress" {
@@ -69,4 +51,10 @@ variable "sg_egress" {
   description = "Egress security group"
   type        = list(any)
   default     = []
+}
+
+variable "load_balancer_type" {
+  type        = string
+  description = "Type of the load balancer"
+  default     = "application"
 }

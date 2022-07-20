@@ -2,16 +2,14 @@
 # ECS resources
 # ---------------------------------------------------------------------------
 resource "aws_ecs_task_definition" "this" {
-  count = length(var.services)
+  for_each = { for idx, service in keys(var.services) :
+    idx => var.services[service]
+  }
 
-  # depends_on = [
-  #   docker_registry_image.this
-  # ]
-
-  family = "${var.services[count.index].name}-task"
+  family = "${each.value.name}-task"
   container_definitions = jsonencode([{
-    name      = "${var.services[count.index].name}-container"
-    image     = "${aws_ecr_repository.this[count.index].repository_url}:latest"
+    name      = "${each.value.name}-container"
+    image     = "${aws_ecr_repository.this[each.key].repository_url}:latest"
     essential = true
 
     environment = [
@@ -24,7 +22,7 @@ resource "aws_ecs_task_definition" "this" {
 
     portMappings = [{
       protocol      = "tcp"
-      containerPort = var.services[count.index].containerPort
+      containerPort = each.value.containerPort
       hostPort      = 80
     }]
 
@@ -43,7 +41,7 @@ resource "aws_ecs_task_definition" "this" {
   cpu                      = var.container_cpu
   tags = merge(
     {
-      "Name" = "${var.services[count.index].name}-task"
+      "Name" = "${each.value.name}-task"
     },
     var.tags,
     var.task_definition_tags
@@ -86,7 +84,7 @@ module "internal_alb" {
   vpc_id        = var.vpc_id
   vpc_cidr      = var.vpc_cidr
   internal      = true
-  target_groups = [for service in var.services : { name : service.name, health_check_path : var.health_check_path }]
+  target_groups = [for key, service in var.services : { name : service.name, health_check_path : var.health_check_path }]
 
   subnet_ids = var.private_subnet_ids
 
@@ -121,12 +119,14 @@ module "internal_alb" {
       cidr_blocks = [var.vpc_cidr]
     }
   ]
+  tags = {
+    security_group_tags = var.private_alb_tags.security_group_tags
+    load_balancer_tags  = var.private_alb_tags.load_balancer_tags
+    target_group_tags   = var.private_alb_tags.target_group_tags
+    listener_tags       = var.private_alb_tags.listener_tags
+    common              = var.private_alb_tags.tags
 
-  security_group_tags = var.private_alb_tags.security_group_tags
-  load_balancer_tags  = var.private_alb_tags.load_balancer_tags
-  target_group_tags   = var.private_alb_tags.target_group_tags
-  listener_tags       = var.private_alb_tags.listener_tags
-  tags                = var.private_alb_tags.tags
+  }
 }
 
 module "internal_alb_dns" {
@@ -157,17 +157,20 @@ module "internal_alb_dns" {
 
 resource "aws_ecs_service" "this" {
 
-  count = length(var.services)
+  for_each = { for idx, service in keys(var.services) :
+    idx => var.services[service]
+  }
 
   depends_on = [
-    aws_ecs_cluster.this
+    aws_ecs_cluster.this,
+    aws_ecs_task_definition.this
   ]
 
-  name            = "${var.services[count.index].name}-service"
+  name            = "${each.value.name}-service"
   cluster         = aws_ecs_cluster.this.id
-  task_definition = aws_ecs_task_definition.this[count.index].arn
+  task_definition = aws_ecs_task_definition.this[each.key].arn
 
-  desired_count = var.services[count.index].replicas
+  desired_count = each.value.replicas
 
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
@@ -184,9 +187,9 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    target_group_arn = module.internal_alb.target_groups[count.index].arn
-    container_name   = "${var.services[count.index].name}-container"
-    container_port   = var.services[count.index].containerPort
+    target_group_arn = module.internal_alb.target_groups[each.key].arn
+    container_name   = "${each.value.name}-container"
+    container_port   = each.value.containerPort
   }
 
   lifecycle {

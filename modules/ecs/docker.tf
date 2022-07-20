@@ -1,13 +1,17 @@
 resource "aws_ecr_repository" "this" {
-  count = length(var.services)
+  for_each = { for idx, service in keys(var.services) :
+    idx => var.services[service]
+  }
 
-  name                 = "ecr-${element(var.services, count.index).name}"
+  name                 = "ecr-${each.value.name}"
   image_tag_mutability = "MUTABLE"
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
-  count      = length(var.services)
-  repository = aws_ecr_repository.this[count.index].name
+  for_each = { for idx, service in keys(var.services) :
+    idx => var.services[service]
+  }
+  repository = aws_ecr_repository.this[each.key].name
 
   policy = jsonencode({
     rules = [{
@@ -24,17 +28,3 @@ resource "aws_ecr_lifecycle_policy" "this" {
     }]
   })
 }
-
-
-#reference: https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs
-#reference: https://medium.com/devops-engineer-documentation/terraform-deploying-a-docker-image-to-an-aws-ecs-cluster-3931337e82fb
-# resource "docker_registry_image" "this" {
-#   count = length(var.services)
-#   name  = "${aws_ecr_repository.this[count.index].repository_url}:latest"
-
-
-#   build {
-#     context  = "../../resources/services/${element(var.services, count.index).location}"
-#     platform = "linux/amd64"
-#   }
-# }

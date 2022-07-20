@@ -63,9 +63,6 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_lambda_permission" "this" {
-  depends_on = [
-    aws_lambda_function.this
-  ]
   for_each      = local.lambdas
   action        = "lambda:InvokeFunction"
   function_name = each.key

@@ -34,7 +34,7 @@ variable "cluster_tags" {
 }
 
 variable "services" {
-  type = list(object({
+  type = map(object({
     name          = string
     image         = string
     location      = string
@@ -82,23 +82,6 @@ variable "tags" {
   default     = {}
 }
 
-variable "public_alb_tags" {
-  type = object({
-    listener_tags       = map(string),
-    target_group_tags   = map(string),
-    load_balancer_tags  = map(string),
-    security_group_tags = map(string),
-    tags                = map(string),
-  })
-  description = "Tags to be applied to the ALB"
-  default = {
-    listener_tags       = {},
-    target_group_tags   = {},
-    load_balancer_tags  = {},
-    security_group_tags = {},
-    tags                = {},
-  }
-}
 variable "private_alb_tags" {
   type = object({
     listener_tags       = map(string),
