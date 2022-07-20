@@ -6,7 +6,7 @@ import jwt
 from typing import Union
 import os
 
-from fastapi import APIRouter, Body, FastAPI, Response, status
+from fastapi import APIRouter, Body, FastAPI, HTTPException, Response, status
 
 import boto3
 from pydantic import BaseModel
@@ -75,7 +75,7 @@ def update_user_auth(user, oauth):
 
 
 @prefix_router.get("/login")
-def login(code: str, response: Response):
+def login(code: str):
 
     msg_bytes = f"{client_id}:{client_secret}".encode('utf-8')
     msg_b64 = base64.b64encode(msg_bytes).decode('utf-8')
@@ -97,8 +97,7 @@ def login(code: str, response: Response):
         return {"error": "request to cognito failed"}
 
     if oauth.status_code != 200:
-        response.status_code = status.HTTP_418_IM_A_TEAPOT
-        return oauth.json()
+        raise HTTPException(status_code=oauth.status_code, detail=oauth.json())
 
     headers = {
         'Authorization': f"Bearer {oauth.json()['access_token']}",
@@ -108,20 +107,18 @@ def login(code: str, response: Response):
         user = httpx.get(f"{AUTH_DOMAIN}/oauth2/userInfo", headers=headers)
     except Exception as e:
         print(e)
-        response.status_code = status.HTTP_418_IM_A_TEAPOT
-        return user.json()
+        raise HTTPException(status_code=user.status_code, detail={
+                            "message": "oath userinfo failed", "oauth": user.json()})
 
     if user.status_code != 200:
-        response.status_code = status.HTTP_418_IM_A_TEAPOT
-        return user.json()
+        raise HTTPException(status_code=user.status_code, detail=user.json())
 
     try:
         # get to dynamo
         user_db = users.get_item(Key={'id': user.json()['sub']})
     except Exception as e:
         print(e)
-        response.status_code = status.HTTP_418_IM_A_TEAPOT
-        return {"error": "request to dynamo failed"}
+        raise HTTPException(status_code=user_db.status_code, detail=user_db.json())
 
     if not "Item" in user_db:
         user_db = create_user(user, oauth)
@@ -172,14 +169,18 @@ def health_check():
 @prefix_router.get("/{user_id}")
 async def get_user(user_id: str):
 
-    mock_user = User(
-        id=user_id,
-        email="mock@email.com",
-        full_name="Mock User",
-        role=Role.STUDENT
-    )
+    user = users.get_item(Key={'id': user_id})
 
-    return mock_user
+    if not "Item" in user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "id": user['Item']['id'],
+        "email": user['Item']['email'],
+        "name": user['Item']['username'],
+        "role": user['Item']['role'],
+        "avatarUrl": user['Item']['avatar_url']
+    }
 
 
 app.include_router(prefix_router)
