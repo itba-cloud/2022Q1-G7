@@ -1,4 +1,5 @@
 resource "aws_apigatewayv2_vpc_link" "this" {
+  provider = aws.aws
   name               = "vpc-link2"
   security_group_ids = [module.ecs.security_group_id]
   subnet_ids         = [for az, subnet in module.vpc["vpc-1"].private_subnet_ids : subnet]
@@ -6,6 +7,10 @@ resource "aws_apigatewayv2_vpc_link" "this" {
 
 module "api_gw" {
   source = "../../modules/api_gw"
+
+  providers = {
+    aws = aws.aws
+  }
 
   depends_on = [
     aws_apigatewayv2_vpc_link.this
