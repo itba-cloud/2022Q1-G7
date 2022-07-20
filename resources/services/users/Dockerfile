@@ -1,5 +1,5 @@
 #reference: https://fastapi.tiangolo.com/deployment/docker/
-FROM python:3.9
+FROM python:3.9-alpine
 
 WORKDIR /code
 
