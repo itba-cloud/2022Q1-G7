@@ -132,7 +132,8 @@ module "internal_alb" {
 module "internal_alb_dns" {
 
   depends_on = [
-    module.internal_alb
+    module.internal_alb.dns_name,
+    module.internal_alb.zone_id,
   ]
 
   source = "../route_53"

@@ -73,9 +73,6 @@ resource "aws_cognito_user_pool_domain" "main" {
 }
 
 resource "aws_cognito_user_pool_client" "userpool_client" {
-  depends_on = [
-    module.presentation
-  ]
 
   provider                             = aws.aws
   name                                 = local.cognito.name
