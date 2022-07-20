@@ -24,6 +24,11 @@ prefix_router = APIRouter(prefix="/courses")
 
 dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 courses = dynamodb.Table('courses')
+users = dynamodb.Table('users')
+s3_resource = boto3.resource('s3', region_name='us-east-1')
+images = s3_resource.Bucket('final-cloud-g7-images')
+content = s3_resource.Bucket('final-cloud-g7-content')
+s3 = boto3.client('s3', region_name='us-east-1')
 
 
 class Course(BaseModel):
@@ -146,22 +151,37 @@ async def subscribe_to_course(course_id: str, user_id: str):
 
 
 @ prefix_router.post("", status_code=201)
-async def create_course(user_id: str, course: InputCourse):
+async def create_course(user_id:str = Form(...), image: UploadFile = File(...), name: str = Form(...), description: str = Form(...)):
     course_id = uuid4()
+
+    #get owner info
+    try:
+        owner_info = users.get_item(Key={'id': user_id})['Item']
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail="User not found")
+
+    #upload image
+    if image:
+        try:
+            img = images.put_object(Bucket=images.name, Key= f"{course_id}-{image.filename}", Body=image.file)
+        except:
+            raise HTTPException(status_code=500, detail="Error uploading image")
+    
     owner = {
         "id": user_id,
         "role": "teacher",
-        "name": "Jhon Doe",
-        "avatarUrl": "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200",
-        "email": "jhondoe@mail.com",
+        "name": owner_info["username"],
+        "avatarUrl": owner_info["avatar_url"],
+        "email": owner_info["email"],
     }
 
     item_user = {
         'PK': f"user:{user_id}:student",
         'SK': f"course:{course_id}",
-        'name': course.name,
-        'description': course.description,
-        'image': '',
+        'name': name,
+        'description':description,
+        'image': f"https://{images.name}.s3.amazonaws.com/{img.key}",
         'rating': -1,
         'owner': owner['name'],
     }
@@ -173,9 +193,9 @@ async def create_course(user_id: str, course: InputCourse):
     item = {
         'PK': f"course:{course_id}",
         'SK': f"course:{course_id}",
-        'name': course.name,
-        'description': course.description,
-        'image': '',
+        'name': name,
+        'description': description,
+        'image': f"https://{images.name}.s3.amazonaws.com/{img.key}",
         'rating': -1,
         'owner': owner['name'],
         'owner_info': owner,
@@ -195,10 +215,6 @@ async def create_course(user_id: str, course: InputCourse):
     return
 
 
-s3_resource = boto3.resource('s3', region_name='us-east-1')
-images = s3_resource.Bucket('final-cloud-g7-images')
-content = s3_resource.Bucket('final-cloud-g7-content')
-s3 = boto3.client('s3', region_name='us-east-1')
 
 
 @prefix_router.get("/{course_id}/content")

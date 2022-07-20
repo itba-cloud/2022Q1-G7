@@ -34,7 +34,7 @@ resource "aws_apigatewayv2_route" "this" {
   target = "integrations/${aws_apigatewayv2_integration.this[count.index].id}"
 
   authorization_type = var.routes[count.index].authorization_type
-  authorizer_id      = aws_apigatewayv2_authorizer.this[count.index].id
+  authorizer_id      = element(var.routes, count.index).authorization_type != "NONE" ? aws_apigatewayv2_authorizer.this[count.index].id : null
 }
 
 

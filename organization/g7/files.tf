@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "content" {
     actions = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"]
     }
     resources = ["${aws_s3_bucket.content.arn}/*"]
   }

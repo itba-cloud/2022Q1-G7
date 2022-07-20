@@ -5,8 +5,8 @@ locals {
   cognito = {
     name                  = "${local.organization}-cognito"
     domain                = "${local.organization}-auth-domain"
-    callback_url_endpoint = "/cognito/callback"
-    logout_url_endpoint   = "/cognito/logout"
+    callback_url_endpoint = "https://final-cloud-g7-web.aleph51.com.ar/cognito/callback"
+    logout_url_endpoint   = "https://final-cloud-g7-web.aleph51.com.ar/cognito/logout"
   }
   vpcs = {
     "vpc-1" = {

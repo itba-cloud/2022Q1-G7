@@ -29,19 +29,32 @@ module "api_gw" {
         "overwrite:path" = "$request.path"
       }
       integration_uri = module.ecs.alb_listener_arn
+    },
+    {
+      integration_type   = "HTTP_PROXY"
+      integration_method = "ANY"
+      connection_type    = "VPC_LINK"
+      connection_id      = aws_apigatewayv2_vpc_link.this.id
+      request_parameters = {
+        "overwrite:path" = "$request.path"
+      }
+      integration_uri = module.ecs.alb_listener_arn
     }
   ]
   routes = [
     {
       route_key          = "ANY /{proxy+}",
       authorization_type = "CUSTOM"
+    },
+    {
+      route_key          = "OPTIONS /{proxy+}",
+      authorization_type = "NONE"
     }
   ]
   authorizers = [
     {
       authorizer_type                   = "REQUEST",
       authorizer_uri                    = aws_lambda_function.this["auth"].invoke_arn,
-      identity_sources                  = ["$request.header.Authorization"]
       name                              = local.authorizer_name
       authorizer_payload_format_version = "2.0"
     }

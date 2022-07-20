@@ -45,9 +45,8 @@ module "ecs" {
   client_id     = aws_cognito_user_pool_client.userpool_client.id
   client_secret = aws_cognito_user_pool_client.userpool_client.client_secret
   auth_domain   = "https://${local.organization}-auth-domain.auth.${data.aws_region.current.name}.amazoncognito.com"
-  #redirect_uri  = "https://www.${module.presentation.website_endpoint}${local.cognito.callback_url_endpoint}"
-  redirect_uri = "http://localhost:3000${local.cognito.callback_url_endpoint}"
-  private_key  = tls_private_key.ssh.private_key_openssh
+  redirect_uri  = local.cognito.callback_url_endpoint
+  private_key   = tls_private_key.ssh.public_key_fingerprint_sha256
 
   services           = local.services
   vpc_id             = module.vpc["vpc-1"].vpc_id
