@@ -5,7 +5,7 @@ from uuid import uuid4
 from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 from typing import List, Union, Any
 
@@ -32,6 +32,7 @@ class CourseOverview(BaseModel):
     numberOfStudents: int
     numberOfTeachers: int
     lastUpdated: str
+    subscribed: bool
 
 
 class InputImage(BaseModel):
@@ -75,33 +76,50 @@ def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "stude
         for item in items['Items']]
 
 
-@prefix_router.get("/{course_id}", response_model=CourseOverview)
-async def get_course(course_id: str):
-    item = courses.query(
+def is_subscribed(user_id: str, course_id: str):
+    sub = courses.query(
+
+        KeyConditionExpression=((Key('PK').eq(f"user:{user_id}:student")
+                                or Key('PK').eq(f"user:{user_id}:teacher"))
+                                & Key('SK').eq(f"course:{course_id}"))
+    )
+    return len(sub['Items']) > 0
+
+
+@ prefix_router.get("/{course_id}", response_model=CourseOverview)
+async def get_course(course_id: str, user_id: Union[str, None]="#"):
+    item=courses.query(
         KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
     )
     if len(item['Items']) == 0:
         raise HTTPException(status_code=404, detail="Course not found")
-    item = item['Items'][0]
-    course_overview = CourseOverview(
+    item=item['Items'][0]
+
+    course_overview=CourseOverview(
         data=Course(id=item['SK'].split(":")[1], name=item['name'], description=item['description'],
                     image=item['image'], rating=item['rating'], owner=item['owner']),
         owner=item['owner_info'],
         numberOfStudents=item['students'],
         numberOfTeachers=item['teachers'],
-        lastUpdated=item['lastUpdated']
+        lastUpdated=item['lastUpdated'],
+        subscribed=is_subscribed(user_id, course_id)
     )
     return course_overview
 
 
-@prefix_router.post("/subscriptions", status_code=204)
+@ prefix_router.post("/subscriptions", status_code=201)
 async def subscribe_to_course(course_id: str, user_id: str):
-    item = courses.query(
+    item=courses.query(
         KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
     )
+
     if len(item['Items']) == 0:
         raise HTTPException(status_code=404, detail="Course not found")
-    item = item['Items'][0]
+    item=item['Items'][0]
+
+    if is_subscribed(user_id, course_id):
+        raise HTTPException(status_code=409, detail="Already subscribed")
+
     courses.put_item(
         Item={
             'PK': f"user:{user_id}:student",
@@ -115,16 +133,14 @@ async def subscribe_to_course(course_id: str, user_id: str):
     )
 
     item['students'] += 1
-    courses.update_item(
+    courses.put_item(
         Item=item)
-
-    return None
 
 
 @ prefix_router.post("", status_code=201)
 async def create_course(user_id: str, course: InputCourse):
-    course_id = uuid4()
-    owner = {
+    course_id=uuid4()
+    owner={
         "id": user_id,
         "role": "teacher",
         "name": "Jhon Doe",
@@ -132,7 +148,7 @@ async def create_course(user_id: str, course: InputCourse):
         "email": "jhondoe@mail.com",
     }
 
-    item_user = {
+    item_user={
         'PK': f"user:{user_id}:student",
         'SK': f"course:{course_id}",
         'name': course.name,
@@ -146,7 +162,7 @@ async def create_course(user_id: str, course: InputCourse):
         Item=item_user
     )
 
-    item = {
+    item={
         'PK': f"course:{course_id}",
         'SK': f"course:{course_id}",
         'name': course.name,
@@ -164,7 +180,7 @@ async def create_course(user_id: str, course: InputCourse):
         Item=item
     )
 
-    item['PK'] = f"user:#"
+    item['PK']=f"user:#"
     courses.put_item(
         Item=item
     )
