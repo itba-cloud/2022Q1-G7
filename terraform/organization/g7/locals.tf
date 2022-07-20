@@ -18,6 +18,7 @@ locals {
           az   = "us-east-1a"
           tags = {
             resource = "omni-subnet-1-private"
+            environment = "demo"
           }
         },
         "subnet-2-private" = {
@@ -25,6 +26,7 @@ locals {
           az   = "us-east-1b"
           tags = {
             resource = "omni-subnet-2-private"
+            environment = "demo"
           }
         }
       },
@@ -35,6 +37,7 @@ locals {
           az   = "us-east-1a"
           tags = {
             resource = "omni-subnet-1-public"
+            environment = "demo"
           }
         },
         "subnet-2-public" = {
@@ -42,6 +45,7 @@ locals {
           az   = "us-east-1b"
           tags = {
             resource = "omni-subnet-2-public"
+            environment = "demo"
           }
         }
       },
@@ -68,12 +72,14 @@ locals {
         },
         tags = {
           resource = "omni-network-acl"
+          environment = "demo"
         }
       }
       enable_dns_hostnames = true
       enable_dns_support   = true
       tags = {
         resource = "omni-vpc-1"
+        environment = "demo"
       }
     }
   }
@@ -100,15 +106,19 @@ locals {
     },
     official_tags = {
       resource = "omni-website-official-site"
+      environment = "demo"
     },
     www_tags = {
       resource = "omni-website-www-site"
+      environment = "demo"
     },
     log_tags = {
       resource = "omni-website-logs"
+      environment = "demo"
     },
     tags = {
       resource = "omni-website"
+      environment = "demo"
     }
   }
 
@@ -169,32 +179,41 @@ locals {
     health_check_path = "health-check"
     task_definition_tags = {
       resource = "omni-ecs-task-definition"
+      environment = "demo"
     },
     cluster_tags = {
       resource = "omni-ecs-cluster"
+      environment = "demo"
     },
     security_group_tags = {
       resource = "omni-ecs-security-group"
+      environment = "demo"
     },
     tags = {
       resource = "omni-ecs"
+      environment = "demo"
     },
     alb = {
       tags = {
         security_group_tags = {
           resource = "omni-ecs-alb-security-group"
+          environment = "demo"
         },
         load_balancer_tags = {
           resource = "omni-ecs-alb"
+          environment = "demo"
         },
         target_group_tags = {
           resource = "omni-ecs-alb-target-group"
+          environment = "demo"
         },
         listener_tags = {
           resource = "omni-ecs-alb-listener"
+          environment = "demo"
         },
         tags = {
           resource = "omni-ecs-alb"
+          environment = "demo"
         }
       }
     }
