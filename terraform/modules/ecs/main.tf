@@ -79,7 +79,7 @@ resource "aws_ecs_cluster_capacity_providers" "this" {
 }
 
 module "internal_alb" {
-  source        = "../alb"
+  source        = "../lb"
   name          = "${var.name}-internal-alb"
   vpc_id        = var.vpc_id
   vpc_cidr      = var.vpc_cidr

@@ -94,8 +94,8 @@ resource "aws_s3_object" "this" {
   for_each = try(var.objects, {}) #{ for object, key in var.objects: object => key if try(var.objects, {}) != {} }
 
   bucket        = aws_s3_bucket.this.id
-  key           = try(each.value.rendered, replace(each.value.filename, "html/", ""))         # remote path
-  source        = try(each.value.rendered, format("../../resources/%s", each.value.filename)) # where is the file located
+  key           = try(each.value.rendered, replace(each.value.filename, "html/", ""))            # remote path
+  source        = try(each.value.rendered, format("../../../resources/%s", each.value.filename)) # where is the file located
   content_type  = each.value.content_type
   storage_class = try(each.value.tier, "STANDARD")
 }

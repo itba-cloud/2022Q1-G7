@@ -14,7 +14,7 @@ resource "aws_lambda_function" "this" {
     variables = each.value.env
   }
 
-  source_code_hash = filebase64sha256("../../resources/${each.value.path}")
+  source_code_hash = filebase64sha256("../../../resources/${each.value.path}")
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {

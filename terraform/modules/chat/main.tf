@@ -3,23 +3,23 @@
 locals {
   lambdas = {
     "connect" = {
-      resource  = "../../resources/lambda/connect_handler.js.zip"
+      resource  = "../../../resources/lambda/connect_handler.js.zip"
       route_key = "$connect"
       handler   = "connect_handler.handler"
     }
     "disconnect" = {
-      resource  = "../../resources/lambda/disconnect_handler.js.zip"
+      resource  = "../../../resources/lambda/disconnect_handler.js.zip"
       route_key = "$disconnect"
       handler   = "disconnect_handler.handler"
 
     }
     "sendmessage" = {
-      resource  = "../../resources/lambda/send_message_handler.js.zip"
+      resource  = "../../resources/../lambda/send_message_handler.js.zip"
       route_key = "sendmessage"
       handler   = "send_message_handler.handler"
     }
     "default" = {
-      resource  = "../../resources/lambda/default_chat_handler.js.zip"
+      resource  = "../../resources/../lambda/default_chat_handler.js.zip"
       route_key = "$default"
       handler   = "default_chat_handler.handler"
     }
