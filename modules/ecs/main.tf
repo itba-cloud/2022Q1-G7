@@ -90,6 +90,38 @@ module "internal_alb" {
 
   subnet_ids = var.private_subnet_ids
 
+  sg_ingress = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "icmp"
+      cidr_blocks = [var.vpc_cidr]
+    },
+
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cidr]
+    },
+
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cidr]
+    }
+  ]
+
+  sg_egress = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = [var.vpc_cidr]
+    }
+  ]
+
   security_group_tags = var.private_alb_tags.security_group_tags
   load_balancer_tags  = var.private_alb_tags.load_balancer_tags
   target_group_tags   = var.private_alb_tags.target_group_tags

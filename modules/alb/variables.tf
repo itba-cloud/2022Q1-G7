@@ -59,3 +59,14 @@ variable "listener_tags" {
   description = "Tags to be applied to the load balancer listener"
   default     = {}
 }
+
+variable "sg_ingress" {
+  description = "Ingress security group"
+  type        = list(any)
+  default     = []
+}
+variable "sg_egress" {
+  description = "Egress security group"
+  type        = list(any)
+  default     = []
+}

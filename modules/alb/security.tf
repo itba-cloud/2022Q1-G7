@@ -2,31 +2,25 @@ resource "aws_security_group" "this" {
   name   = var.name
   vpc_id = var.vpc_id
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "icmp"
-    cidr_blocks = [var.internal ? var.vpc_cidr : "0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.sg_ingress
+    content {
+      from_port   = ingress.value.from_port
+      protocol    = ingress.value.protocol
+      to_port     = ingress.value.to_port
+      cidr_blocks = ingress.value.cidr_blocks
+    }
+
   }
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.internal ? var.vpc_cidr : "0.0.0.0/0"]
-  }
+  dynamic "egress" {
+    for_each = var.sg_egress
+    content {
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.internal ? var.vpc_cidr : "0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr]
+      from_port   = egress.value.from_port
+      protocol    = egress.value.protocol
+      to_port     = egress.value.to_port
+      cidr_blocks = egress.value.cidr_blocks
+    }
   }
 }
