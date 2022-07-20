@@ -19,6 +19,7 @@ module "vpc" {
 
 # Generate a new SSH key
 resource "tls_private_key" "ssh" {
+  provider = tls
   algorithm = "RSA"
   rsa_bits  = "4096"
 }
