@@ -64,10 +64,23 @@ resource "aws_apigatewayv2_authorizer" "this" {
     aws_apigatewayv2_api.this
   ]
 
-  api_id                            = aws_apigatewayv2_api.this.id
-  authorizer_type                   = var.authorizers[count.index].authorizer_type
-  authorizer_uri                    = var.authorizers[count.index].authorizer_uri
-  identity_sources                  = var.authorizers[count.index].identity_sources
+  api_id                           = aws_apigatewayv2_api.this.id
+  authorizer_type                  = var.authorizers[count.index].authorizer_type
+  authorizer_uri                   = var.authorizers[count.index].authorizer_uri
+  authorizer_result_ttl_in_seconds = 0
+
+  #identity_sources                  = var.authorizers[count.index].identity_sources
   name                              = var.authorizers[count.index].name
   authorizer_payload_format_version = var.authorizers[count.index].authorizer_payload_format_version
+  authorizer_credentials_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  enable_simple_responses           = true
+}
+
+resource "aws_lambda_permission" "this" {
+  count = length(var.authorizers)
+
+  action        = "lambda:InvokeFunction"
+  function_name = "auth"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.this.id}/authorizers/${aws_apigatewayv2_authorizer.this[count.index].id}"
 }

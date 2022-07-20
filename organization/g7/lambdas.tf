@@ -13,6 +13,8 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = each.value.env
   }
+
+  source_code_hash = filebase64sha256("../../resources/${each.value.path}")
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {

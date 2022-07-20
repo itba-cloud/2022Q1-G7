@@ -1,6 +1,6 @@
 locals {
   region       = "us-east-1"
-  organization = "final-cc-test"
+  organization = "final-cloud-g7"
 
   cognito = {
     name                  = "${local.organization}-cognito"
@@ -137,7 +137,7 @@ locals {
       resource  = "auth"
       method    = "ANY"
       env = {
-        PRIVATE_KEY = tls_private_key.ssh.private_key_openssh
+        PRIVATE_KEY = tls_private_key.ssh.public_key_fingerprint_sha256
       }
       #source_arn = aws_api_gateway_stage.this.execution_arn
     },

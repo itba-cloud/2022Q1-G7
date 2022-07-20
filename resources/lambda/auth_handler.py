@@ -9,29 +9,48 @@ users = dyanamodb.Table('users')
 
 
 def main(event, context):
-    token = event['authorizationToken']
+    print(event)
+    # check if login
+    if event['pathParameters']['proxy'] == 'users/login':
+        return {
+            'isAuthorized': True,
+        }
+
+    if ('headers' not in event) or ('authorization' not in event['headers']):
+        print("No authorization header")
+        return {
+            'isAuthorized': False,
+        }
+
+    token = event['headers']['authorization'].split(' ')[1]
+    print(token)
     try:
-        payload = jwt.decode(token, PRIVATE_KEY, algorithm="HS256")
-        user = users.get_item(Key={'id': payload['sub']})
+        print(PRIVATE_KEY)
+        payload = jwt.decode(token, PRIVATE_KEY, algorithms="HS256")
+        print(payload)
+        user = users.get_item(Key={'id': payload['id']})
+        print(user)
         if 'Item' in user:
             return {
-                'isAuthenticated': True,
+                'isAuthorized': True,
                 'user': user['Item']
             }
         else:
             return {
-                'isAuthenticated': False
+                'isAuthorized': False
             }
     except jwt.ExpiredSignatureError:
+        print("Signature expired")
         return {
-            'isAuthenticated': False
+            'isAuthorized': False
         }
     except jwt.InvalidTokenError:
+        print("Invalid token")
         return {
-            'isAuthenticated': False
+            'isAuthorized': False
         }
     except Exception as e:
         print(e)
         return {
-            'isAuthenticated': False
+            'isAuthorized': False
         }
