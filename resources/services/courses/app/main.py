@@ -58,7 +58,7 @@ def health_check():
     return {"status": "ok"}
 
 
-@prefix_router.get("/", response_model=List[Course])
+@prefix_router.get("", response_model=List[Course])
 def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "student"):
     if user_id == "#":
         role = None
@@ -75,7 +75,7 @@ def get_courses(user_id: Union[str, None] = "#", role: Union[str, None] = "stude
         for item in items['Items']]
 
 
-@ prefix_router.get("/{course_id}", response_model=CourseOverview)
+@prefix_router.get("/{course_id}", response_model=CourseOverview)
 async def get_course(course_id: str):
     item = courses.query(
         KeyConditionExpression=Key('PK').eq(f"course:{course_id}")
@@ -121,7 +121,7 @@ async def subscribe_to_course(course_id: str, user_id: str):
     return None
 
 
-@ prefix_router.post("/", status_code=201)
+@ prefix_router.post("", status_code=201)
 async def create_course(user_id: str, course: InputCourse):
     course_id = uuid4()
     owner = {

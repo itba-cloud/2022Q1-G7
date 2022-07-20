@@ -1,22 +1,21 @@
 # reference: https://fastapi.tiangolo.com/deployment/docker/
 import base64
 import enum
-from turtle import update
-from urllib import response
 import httpx
 import jwt
 from typing import Union
 import os
 
-from fastapi import APIRouter, FastAPI, Response, status
+from fastapi import APIRouter, Body, FastAPI, Response, status
 
 import boto3
 from pydantic import BaseModel
 
 
 class Role(enum.Enum):
-    STUDENT = "student"
-    TEACHER = "teacher"
+    STUDENT = "STUDENT"
+    TEACHER = "TEACHER"
+    NONE = "NONE"
 
 
 class User(BaseModel):
@@ -48,8 +47,8 @@ cognito_endpoint = f"{AUTH_DOMAIN}/oauth2/token"
 dyanamodb = boto3.resource('dynamodb', region_name='us-east-1')
 users = dyanamodb.Table('users')
 
-def create_user(user, oauth):
 
+def create_user(user, oauth):
 
     item = {
         'id': user.json()['sub'],
@@ -59,14 +58,16 @@ def create_user(user, oauth):
         "access_token": oauth.json()['access_token'],
         "refresh_token": oauth.json()['refresh_token'],
         "expires_in": oauth.json()['expires_in'],
-        "avatar_url": ""
+        "avatar_url": "",
+        "role": Role.NONE.value
 
     }
     users.put_item(Item=item)
     return item
 
+
 def update_user_auth(user, oauth):
-    users.update_item(Key={'id': user.json()['sub']}, AttributeUpdates = {
+    users.update_item(Key={'id': user.json()['sub']}, AttributeUpdates={
         'id_token': {'Value': oauth.json()['id_token']},
         'access_token': {'Value': oauth.json()['access_token']},
         'refresh_token': {'Value': oauth.json()['refresh_token']},
@@ -131,7 +132,7 @@ def login(code: str, response: Response):
         user_db = user_db['Item']
 
     jwt_payload = {
-        "role": "student",
+        "role": user_db['role'],
         "id": user.json()['sub'],
     }
 
@@ -144,12 +145,23 @@ def login(code: str, response: Response):
             "id": user_db['id'],
             "email": user_db['email'],
             "name": user_db['username'],
-            "role": "student",
+            "role": user_db["role"],
             "avatarUrl": user_db["avatar_url"]
         },
         "token": jwt_token,
     }
     return payload
+
+
+class UserUpdate(BaseModel):
+    role: Role
+
+@prefix_router.put("/{id}/role")
+def update_role(id: str, user_update: UserUpdate):
+    users.update_item(Key={'id': id}, AttributeUpdates={
+        'role': {'Value': user_update.role.value}
+    })
+    return {"role": user_update.role.value}
 
 
 @app.get("/health-check")
