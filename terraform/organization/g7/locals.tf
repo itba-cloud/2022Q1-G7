@@ -1,5 +1,5 @@
 locals {
-  region       = "us-east-1"
+  region       = data.aws_region.current.name
   organization = "final-cloud-g7"
 
   cognito = {
@@ -17,14 +17,14 @@ locals {
           cidr = "10.0.1.0/24"
           az   = "us-east-1a"
           tags = {
-
+            resource = "omni-subnet-1-private"
           }
         },
         "subnet-2-private" = {
           cidr = "10.0.2.0/24"
           az   = "us-east-1b"
           tags = {
-
+            resource = "omni-subnet-2-private"
           }
         }
       },
@@ -34,14 +34,14 @@ locals {
           cidr = "10.0.3.0/24"
           az   = "us-east-1a"
           tags = {
-
+            resource = "omni-subnet-1-public"
           }
         },
         "subnet-2-public" = {
           cidr = "10.0.4.0/24"
           az   = "us-east-1b"
           tags = {
-
+            resource = "omni-subnet-2-public"
           }
         }
       },
@@ -67,13 +67,13 @@ locals {
           }
         },
         tags = {
-
+          resource = "omni-network-acl"
         }
       }
       enable_dns_hostnames = true
       enable_dns_support   = true
       tags = {
-
+        resource = "omni-vpc-1"
       }
     }
   }
@@ -99,16 +99,16 @@ locals {
       }
     },
     official_tags = {
-
+      resource = "omni-website-official-site"
     },
     www_tags = {
-
+      resource = "omni-website-www-site"
     },
     log_tags = {
-
+      resource = "omni-website-logs"
     },
     tags = {
-
+      resource = "omni-website"
     }
   }
 
@@ -168,33 +168,33 @@ locals {
   ecs = {
     health_check_path = "health-check"
     task_definition_tags = {
-
+      resource = "omni-ecs-task-definition"
     },
     cluster_tags = {
-
+      resource = "omni-ecs-cluster"
     },
     security_group_tags = {
-
+      resource = "omni-ecs-security-group"
     },
     tags = {
-
+      resource = "omni-ecs"
     },
     alb = {
       tags = {
         security_group_tags = {
-
+          resource = "omni-ecs-alb-security-group"
         },
         load_balancer_tags = {
-
+          resource = "omni-ecs-alb"
         },
         target_group_tags = {
-
+          resource = "omni-ecs-alb-target-group"
         },
         listener_tags = {
-
+          resource = "omni-ecs-alb-listener"
         },
         tags = {
-
+          resource = "omni-ecs-alb"
         }
       }
     }
