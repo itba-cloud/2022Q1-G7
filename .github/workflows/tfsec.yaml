@@ -40,7 +40,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@master
       - name: tfsec
-        uses: aquasecurity/tfsec-pr-commenter-action@1672d3f23fd98a39c30d0fb7d8d1b4f0967134bd
+        uses: aquasecurity/tfsec-pr-commenter-action@1015a3975c7f1400ee4d9f423a7786a3df9fcbec
         with:
           working_directory: terraform/organization
           tfsec_args: --exclude-path 'terraform/modules'
